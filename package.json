@@ -19,6 +19,7 @@
   "homepage": "https://github.com/janis-commerce/export.git#readme",
   "devDependencies": {
     "@janiscommerce/api-test": "^2.1.2",
+    "@janiscommerce/event-listener-test": "^1.0.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.2.0",
     "eslint-plugin-import": "^2.18.2",
@@ -37,8 +38,11 @@
   "dependencies": {
     "@janiscommerce/api-save": "^4.3.1",
     "@janiscommerce/event-emitter": "^2.0.2",
+    "@janiscommerce/event-listener": "^1.1.0",
+    "@janiscommerce/mail": "^1.0.0",
     "@janiscommerce/microservice-call": "^3.0.1",
     "@janiscommerce/model": "^3.6.0",
+    "lllog": "^1.1.2",
     "superstruct": "0.6.1"
   }
 }
