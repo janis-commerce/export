@@ -20,8 +20,10 @@ In orden to be functional the Export API needs:
 
 * Model of the Entities which wants to export
 * Controller to avaible export function
-* Import `ApiExport`
+* Import and Setup `ApiExport`
 * Config schemas and serverless function for `ApiExport` with POST method and `LoggedAuthorizer`.
+* Import and Setup `ProcessedListener`
+* Config schemas and serverless function for `ProcessedListener` like an `event-listener`.
 
 ### Models
 
@@ -73,6 +75,18 @@ Only need to require `ApiExport` and export it.
 const { ApiExport } = require('@janiscommerce/export');
 
 module.exports = ApiExport;
+```
+### Processed Listener
+
+Only need to require `ProccesedListener` and export it.
+
+```js
+'use strict';
+
+const { ServerlessHandler } = require('@janiscommerce/event-listener');
+const { ProccesedListener } = require('@janiscommerce/export');
+
+module.exports.handler = (...args) => ServerlessHandler.handle(ProccesedListener, ...args);
 ```
 
 ## Usage
