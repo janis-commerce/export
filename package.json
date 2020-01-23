@@ -42,6 +42,8 @@
     "@janiscommerce/mail": "^1.0.0",
     "@janiscommerce/microservice-call": "^3.0.1",
     "@janiscommerce/model": "^3.6.0",
+    "@janiscommerce/s3": "^1.2.1",
+    "exceljs": "^3.6.1",
     "lllog": "^1.1.2",
     "superstruct": "0.6.1"
   }
