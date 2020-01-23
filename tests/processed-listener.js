@@ -5,9 +5,12 @@ const logger = require('lllog');
 
 logger('none');
 
+const { ServerlessHandler } = require('@janiscommerce/event-listener');
 const EventListenerTest = require('@janiscommerce/event-listener-test');
 
 const { ProcessedListener, ModelExport } = require('../lib/index');
+
+const handler = (...args) => ServerlessHandler.handle(ProcessedListener, ...args);
 
 describe('Account Saved Listener', async () => {
 
@@ -30,7 +33,7 @@ describe('Account Saved Listener', async () => {
 		]
 	};
 
-	await EventListenerTest(ProcessedListener.handler, [
+	await EventListenerTest(handler, [
 		{
 			description: 'Should return 400 if the event has no client',
 			session: true,
