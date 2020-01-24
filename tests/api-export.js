@@ -7,7 +7,7 @@ const MsCall = require('@janiscommerce/microservice-call');
 const mockRequire = require('mock-require');
 const path = require('path');
 
-const { ApiExport, ModelExport } = require('../lib');
+const { ApiExport, ModelExport, ControllerExport } = require('../lib');
 
 describe('API Export', () => {
 
@@ -22,11 +22,11 @@ describe('API Export', () => {
 	const fakeControllerPath = path.join(process.cwd(), process.env.MS_PATH || '', 'controllers', 'export', 'some-entity');
 
 	class FakeModel {}
-	class FakeController {}
+	class FakeController extends ControllerExport {}
 
 	context('When Fields are Missing', () => {
 
-		ApiTest(ApiExport, '/api/brand', [
+		ApiTest(ApiExport, '/api/export', [
 			{
 				description: 'Should return 400 if the required field \'entity\' is not passed',
 				request: {
@@ -57,7 +57,7 @@ describe('API Export', () => {
 		];
 
 		samples.forEach(([field, data]) => {
-			ApiTest(ApiExport, '/api/brand', [
+			ApiTest(ApiExport, '/api/export', [
 				{
 					description: `Should return 400 if the required field '${field}' is Invalid`,
 					request: {
@@ -74,7 +74,7 @@ describe('API Export', () => {
 
 	context('When no Entity Model exist', () => {
 
-		ApiTest(ApiExport, '/api/brand', [
+		ApiTest(ApiExport, '/api/export', [
 			{
 				description: 'Should return 400',
 				request: {
@@ -99,7 +99,7 @@ describe('API Export', () => {
 		});
 
 
-		ApiTest(ApiExport, '/api/brand', [
+		ApiTest(ApiExport, '/api/export', [
 			{
 				description: 'Should return 400',
 				request: {
@@ -125,7 +125,7 @@ describe('API Export', () => {
 			mockRequire.stop(fakeControllerPath);
 		});
 
-		ApiTest(ApiExport, '/api/brand', [
+		ApiTest(ApiExport, '/api/export', [
 			{
 				description: 'Should return 500 if Microservice Call Fails',
 				request: {
