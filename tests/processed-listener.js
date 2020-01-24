@@ -12,7 +12,7 @@ const { ProcessedListener, ModelExport } = require('../lib/index');
 
 const handler = (...args) => ServerlessHandler.handle(ProcessedListener, ...args);
 
-describe('Account Saved Listener', async () => {
+describe('Processed Export Listener', async () => {
 
 	const validEvent = {
 		service: 'some-service',
