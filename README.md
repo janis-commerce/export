@@ -5,7 +5,7 @@
 
 A package to handle JANIS Export APIs.
 
-This package will provied an API, and two Listeners to quick config a generic **EXPORT API** in yout Microservice.
+This package will provide an API, and two Listeners to quick config a generic **EXPORT API** in your Microservice.
 
 When It's funcional the API will get documents from Entities in your Microservice, make `.xlsx` files and send email to the user who requested with the data recopiled.
 
