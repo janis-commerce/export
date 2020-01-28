@@ -108,15 +108,15 @@ describe('Created Export Listener', async () => {
 			responseCode: 200
 		},
 		{
-			description: 'Should return 500 but used preProcess method',
+			description: 'Should return 500 but used preSaveHook method',
 			session: true,
 			before: sandbox => {
 				sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
-				sandbox.stub(CreatedListener.prototype, 'preProcess').rejects(new Error('Some Error'));
+				sandbox.stub(CreatedListener.prototype, 'preSaveHook').rejects(new Error('Some Error'));
 			},
 			after: sandbox => {
 				sandbox.assert.calledOnce(ModelExport.prototype.get);
-				sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
+				sandbox.assert.calledOnce(CreatedListener.prototype.preSaveHook);
 			},
 			event: { ...validEvent },
 			responseCode: 500
@@ -126,7 +126,7 @@ describe('Created Export Listener', async () => {
 			session: true,
 			before: sandbox => {
 				sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
-				sandbox.spy(CreatedListener.prototype, 'preProcess');
+				sandbox.spy(CreatedListener.prototype, 'preSaveHook');
 				sandbox.spy(CreatedListener.prototype, 'postSaveHook');
 
 				sandbox.stub(FakeModel.prototype, 'get').returns([]);
@@ -136,7 +136,7 @@ describe('Created Export Listener', async () => {
 			},
 			after: sandbox => {
 				sandbox.assert.calledOnce(ModelExport.prototype.get);
-				sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
+				sandbox.assert.calledOnce(CreatedListener.prototype.preSaveHook);
 				sandbox.assert.calledOnce(CreatedListener.prototype.postSaveHook);
 				sandbox.assert.calledOnce(FakeModel.prototype.get);
 				sandbox.assert.calledOnce(ModelExport.prototype.save);
@@ -165,7 +165,7 @@ describe('Created Export Listener', async () => {
 			session: true,
 			before: sandbox => {
 				sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
-				sandbox.spy(CreatedListener.prototype, 'preProcess');
+				sandbox.spy(CreatedListener.prototype, 'preSaveHook');
 				sandbox.spy(CreatedListener.prototype, 'postSaveHook');
 
 				sandbox.spy(FakeController.prototype, 'formatByPage');
@@ -191,7 +191,7 @@ describe('Created Export Listener', async () => {
 			},
 			after: sandbox => {
 				sandbox.assert.calledOnce(ModelExport.prototype.get);
-				sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
+				sandbox.assert.calledOnce(CreatedListener.prototype.preSaveHook);
 				sandbox.assert.callCount(FakeModel.prototype.get, 5);
 				sandbox.assert.calledOnce(FakeModel.prototype.getTotals);
 				sandbox.assert.callCount(FakeController.prototype.formatByPage, 5);
@@ -210,7 +210,7 @@ describe('Created Export Listener', async () => {
 			session: true,
 			before: sandbox => {
 				sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
-				sandbox.spy(CreatedListener.prototype, 'preProcess');
+				sandbox.spy(CreatedListener.prototype, 'preSaveHook');
 				sandbox.spy(CreatedListener.prototype, 'postSaveHook');
 
 				sandbox.spy(FakeController.prototype, 'formatByPage');
@@ -236,7 +236,7 @@ describe('Created Export Listener', async () => {
 			},
 			after: sandbox => {
 				sandbox.assert.calledOnce(ModelExport.prototype.get);
-				sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
+				sandbox.assert.calledOnce(CreatedListener.prototype.preSaveHook);
 				sandbox.assert.callCount(FakeModel.prototype.get, 5);
 				sandbox.assert.calledOnce(FakeModel.prototype.getTotals);
 				sandbox.assert.callCount(FakeController.prototype.formatByPage, 5);
@@ -255,7 +255,7 @@ describe('Created Export Listener', async () => {
 			session: true,
 			before: sandbox => {
 				sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
-				sandbox.spy(CreatedListener.prototype, 'preProcess');
+				sandbox.spy(CreatedListener.prototype, 'preSaveHook');
 				sandbox.spy(CreatedListener.prototype, 'postSaveHook');
 
 				sandbox.spy(FakeController.prototype, 'formatByPage');
@@ -281,7 +281,7 @@ describe('Created Export Listener', async () => {
 			},
 			after: sandbox => {
 				sandbox.assert.calledOnce(ModelExport.prototype.get);
-				sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
+				sandbox.assert.calledOnce(CreatedListener.prototype.preSaveHook);
 				sandbox.assert.callCount(FakeModel.prototype.get, 5);
 				sandbox.assert.calledOnce(FakeModel.prototype.getTotals);
 				sandbox.assert.callCount(FakeController.prototype.formatByPage, 5);
