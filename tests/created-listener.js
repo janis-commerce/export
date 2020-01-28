@@ -144,8 +144,9 @@ describe('Created Export Listener', async () => {
 
 				sandbox.assert.calledWithExactly(FakeModel.prototype.get, {
 					filters: { legs: 4 },
-					sortBy: 'bornYear',
-					sortDirection: 'desc',
+					order: {
+						bornYear: 'desc'
+					},
 					page: 1,
 					limit: 1
 				});
