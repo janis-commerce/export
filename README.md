@@ -24,6 +24,7 @@ In orden to be functional the Export API needs:
 * Create a generic Created Export Listener
 * Create a generic Processed Export Listener
 * Configure Schemas and Serverless functions
+* Configure Events
 
 ### Models
 
@@ -181,15 +182,57 @@ module.exports.handler = (...args) => ServerlessHandler.handle(ExportCreatedList
 
 ### Processed Listener
 
-Only need to require `ProccesedListener` and export it.
+Only need to require `ProcessedListener` and export it.
 
 ```js
 'use strict';
 
 const { ServerlessHandler } = require('@janiscommerce/event-listener');
-const { ProccesedListener } = require('@janiscommerce/export');
+const { ProcessedListener } = require('@janiscommerce/export');
 
-module.exports.handler = (...args) => ServerlessHandler.handle(ProccesedListener, ...args);
+module.exports.handler = (...args) => ServerlessHandler.handle(ProcsesedListener, ...args);
+```
+
+### Events
+
+Must Add to
+
+* `events/events.yml`
+
+```yaml
+- entity: export
+  event: created
+  hasClient: true
+  hasId: true
+  description: When an export was created
+
+- entity: export
+  event: processed
+  hasClient: true
+  hasId: true
+  description: When an export was processed
+```
+
+* `events/{service}/{entity}/created.yml`
+
+```yaml
+- service: {service}
+  entity: export
+  event: created
+  listeners:
+    - namespace: export
+      method: created-listener
+```
+
+* `events/{service}/{entity}/processed.yml`
+
+```yaml
+- service: {service}
+  entity: export
+  event: processed
+  listeners:
+    - namespace: export
+      method: processed-listener
 ```
 
 ## Usage
