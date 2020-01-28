@@ -1,0 +1,51 @@
+components:
+
+  schemas:
+
+    Export:
+      description: A export
+      type: object
+      properties:
+        id:
+          description: The export ID
+          type: string
+          readOnly: true
+        entity:
+          description: The entity to export
+          type: string
+        filters:
+          description: The Filters to do the export
+          type: object
+        sortBy:
+          description: The export sort by field
+          type: string
+        sortDirection:
+          description: The export sort direction
+          type: string
+        userCreated:
+          description: User's ID who created this export
+          type: string
+          readOnly: true
+        userEmail:
+          description: User's Email who created this export
+          type: string
+          readOnly: true
+        files:
+          description: files paths to find the export
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+        - entity
+      example:
+        id: 5d1fc1eeb5b68406e0487a06
+        entity: user
+        filters:
+          status: active
+        sortBy: active
+        sortDirection: ['foo:bar:action']
+        userCreated: 'a1000cdfea12sz'
+        userEmail: 'some@email.com'
+        files:
+          - 'export/user/a1000cdfea12sz/users.xlsx'

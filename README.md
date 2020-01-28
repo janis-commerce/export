@@ -76,6 +76,11 @@ There are a few options to customize the exports.
   Returns `{ [String] }`. Default `[]`.
   It is a List of field to exclude from the file creation.
 
+* *async* `format(item)`.
+
+  Returns `{ Object }`. Default `item`.
+  Format Item Individually after getting from Database.
+
 * *async* `formatByPage(items)`.
 
   Returns `{ [Object] }`. Default `items`.
@@ -105,6 +110,10 @@ class CatController extends ControllerExport {
 
 	get excludeField() {
 		return ['id']; // Will exclude 'id' field
+  }
+
+  async formatByPage(items) {
+    return {...item, userProfile: this.session.profileId };
   }
 
   async formatByPage(items) {
@@ -195,45 +204,17 @@ module.exports.handler = (...args) => ServerlessHandler.handle(ProcsesedListener
 
 ### Events
 
-Must Add to
+* In `path/to/root/events/events.yml`, must add [this](docs/events/events.yml)
 
-* `events/events.yml`
+* In `path/to/root/events/src/{your-service}/export/created.yml`, must add [this file](docs/events/src/export/created.yml)
+* In `path/to/root/events/src/{your-service}/export/processed.yml`, must add [this file](docs/events/src/export/processed.yml)
 
-```yaml
-- entity: export
-  event: created
-  hasClient: true
-  hasId: true
-  description: When an export was created
+### Schemas
 
-- entity: export
-  event: processed
-  hasClient: true
-  hasId: true
-  description: When an export was processed
-```
+In `path/to/root/schemas/src/public/export` add:
 
-* `events/{service}/{entity}/created.yml`
-
-```yaml
-- service: {service}
-  entity: export
-  event: created
-  listeners:
-    - namespace: export
-      method: created-listener
-```
-
-* `events/{service}/{entity}/processed.yml`
-
-```yaml
-- service: {service}
-  entity: export
-  event: processed
-  listeners:
-    - namespace: export
-      method: processed-listener
-```
+* [`base.yml` file](docs/schemas/export/base.yml)
+* [`post.yml` file](docs/schemas/export/post.yml)
 
 ## Usage
 

@@ -1,0 +1,6 @@
+- service: {your-service}
+  entity: export
+  event: processed
+  listeners:
+    - namespace: export
+      method: processed-listener
