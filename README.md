@@ -71,11 +71,6 @@ There are a few options to customize the exports.
   Returns `{ number} `. Default `25000`.
   It is the Document Limit to make the files.
 
-* *getter* `excludeField`
-
-  Returns `{ [String] }`. Default `[]`.
-  It is a List of field to exclude from the file creation.
-
 * *async* `format(item)`.
 
   Returns `{ Object }`. Default `item`.
@@ -90,6 +85,21 @@ There are a few options to customize the exports.
 
   Returns `{ [Object] }`. Default `items`.
   Format Items before making the file.
+
+#### File Fields / Headers
+By Default, Every field in the items getted will be include in the files as headers of each column.
+
+But it can be changed by only one of these getters at a time:
+
+* *getter* `fields`
+
+  Returns `{ [String] } `. Default `[]`.
+  A List of fields to include in the File. It has high priority
+
+* *getter* `excludeFields`
+
+  Returns `{ [String] } `. Default `[]`.
+  A List of fields to exclude in the File. If `fields` has elements Its will be ignored
 
 #### Example
 
@@ -106,10 +116,14 @@ class CatController extends ControllerExport {
 
 	get fileLimit() {
 		return 1000000; // Will create files with 1 millon documents max
-	}
+  }
 
-	get excludeField() {
-		return ['id']; // Will exclude 'id' field
+  get fields() {
+    return ['name']; // Will only include column 'name'
+  }
+
+	get excludeFields() {
+		return ['name']; // Will try to exclude 'name' field, but because 'fields' method has elements it will be ignored
   }
 
   async formatByPage(items) {
