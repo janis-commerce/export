@@ -1,6 +1,8 @@
 'use strict';
 
-const Mail = require('@janiscommerce/mail');
+const { Mail, MailError } = require('@janiscommerce/mail');
+const mockRequire = require('mock-require');
+const path = require('path');
 const logger = require('lllog');
 
 logger('none');
@@ -8,7 +10,7 @@ logger('none');
 const { ServerlessHandler } = require('@janiscommerce/event-listener');
 const EventListenerTest = require('@janiscommerce/event-listener-test');
 
-const { ProcessedListener, ModelExport } = require('../lib/index');
+const { ProcessedListener, ModelExport, ControllerExport } = require('../lib/index');
 
 const handler = (...args) => ServerlessHandler.handle(ProcessedListener, ...args);
 
@@ -24,14 +26,27 @@ describe('Processed Export Listener', async () => {
 
 	const exportDocument = {
 		id: validEvent.id,
-		entity: 'cats',
+		entity: 'cat',
 		userCreated: 'terrier-1',
 		userEmail: 'dogs@revenge.com',
 		files: [
-			'https://janis-some-service-test/exports/defaultClient/terrier-1/cats-001.xlsx',
-			'https://janis-some-service-test/exports/defaultClient/terrier-1/cats-002.xlsx'
+			'exports/defaultClient/terrier-1/cats-001.xlsx',
+			'exports/defaultClient/terrier-1/cats-002.xlsx'
 		]
 	};
+
+	const fakeControllerPath = path.join(process.cwd(), process.env.MS_PATH || '', 'controllers', 'export', 'cat');
+
+	class FakeController extends ControllerExport {}
+
+	before(() => {
+		mockRequire(fakeControllerPath, FakeController);
+	});
+
+	after(() => {
+		mockRequire.stop(fakeControllerPath);
+	});
+
 
 	await EventListenerTest(handler, [
 		{
@@ -101,7 +116,10 @@ describe('Processed Export Listener', async () => {
 				sandbox.assert.calledWithExactly(Mail.prototype.setTo, exportDocument.userEmail);
 				sandbox.assert.calledWithExactly(Mail.prototype.setSubject, `${exportDocument.entity} Export Files`);
 				sandbox.assert.calledWithExactly(Mail.prototype.setEntity, exportDocument.entity);
-				sandbox.assert.calledWithExactly(Mail.prototype.setData, exportDocument.files);
+				sandbox.assert.calledWithExactly(Mail.prototype.setData, {
+					'file-part-1': 'https://s3.amazonaws.com/janis-undefined-service-undefined/exports/defaultClient/terrier-1/cats-001.xlsx',
+					'file-part-2': 'https://s3.amazonaws.com/janis-undefined-service-undefined/exports/defaultClient/terrier-1/cats-002.xlsx'
+				});
 				sandbox.assert.calledWithExactly(Mail.prototype.setTemplateCode, 'export');
 			},
 			event: { ...validEvent },
@@ -143,7 +161,7 @@ describe('Processed Export Listener', async () => {
 				sandbox.stub(Mail.prototype, 'setTemplateCode').returns(Mail.prototype);
 
 				const MsCallError = new Error('Mails Failed');
-				MsCallError.code = 4;
+				MsCallError.code = MailError.codes.MS_CALL_ERROR;
 
 				sandbox.stub(Mail.prototype, 'send').rejects(MsCallError);
 			},
