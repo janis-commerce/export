@@ -10,42 +10,43 @@ components:
           description: The export ID
           type: string
           readOnly: true
+          example: 5d1fc1eeb5b68406e0487a06
         entity:
           description: The entity to export
           type: string
+          example: user
         filters:
           description: The Filters to do the export
           type: object
+          example:
+            status: active
+            name: someName
         sortBy:
           description: The export sort by field
           type: string
+          example: status
         sortDirection:
           description: The export sort direction
           type: string
+          example: 'asc'
         userCreated:
           description: User's ID who created this export
           type: string
           readOnly: true
+          example: '5d1fc1eeb5b68406e0487a08'
         userEmail:
           description: User's Email who created this export
           type: string
           readOnly: true
+          example: 'some@email.com'
         files:
           description: files paths to find the export
           type: array
           items:
             type: string
           readOnly: true
+          example:
+            - 'export/user/a1000cdfea12sz/users.xlsx'
       required:
         - entity
-      example:
-        id: 5d1fc1eeb5b68406e0487a06
-        entity: user
-        filters:
-          status: active
-        sortBy: active
-        sortDirection: ['foo:bar:action']
-        userCreated: 'a1000cdfea12sz'
-        userEmail: 'some@email.com'
-        files:
-          - 'export/user/a1000cdfea12sz/users.xlsx'
+
