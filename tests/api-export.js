@@ -18,6 +18,7 @@ describe('API Export', () => {
 		sortDirection: 'desc'
 	};
 
+	const exportModelPath = path.join(process.cwd(), process.env.MS_PATH || '', 'models', 'export');
 	const fakeModelPath = path.join(process.cwd(), process.env.MS_PATH || '', 'models', 'some-entity');
 	const fakeControllerPath = path.join(process.cwd(), process.env.MS_PATH || '', 'controllers', 'export', 'some-entity');
 
@@ -116,11 +117,13 @@ describe('API Export', () => {
 	context('When Fields are Valid', () => {
 
 		before(() => {
+			mockRequire(exportModelPath, ModelExport);
 			mockRequire(fakeModelPath, FakeModel);
 			mockRequire(fakeControllerPath, FakeController);
 		});
 
 		after(() => {
+			mockRequire.stop(exportModelPath);
 			mockRequire.stop(fakeModelPath);
 			mockRequire.stop(fakeControllerPath);
 		});
