@@ -18,7 +18,7 @@ npm install @janiscommerce/export
 
 In orden to be functional the Export API needs:
 
-* Model of the Entities which wants to export
+* Model of Export and the Entities which wants to export
 * Create Controllers for those entities
 * Create a generic API Export
 * Create a generic Created Export Listener
@@ -26,12 +26,32 @@ In orden to be functional the Export API needs:
 * Configure Schemas and Serverless functions
 * Configure Events
 
+### ENV vars
+
+Needs to be setup
+
+* `JANIS_SERVICE_NAME`, Service Name
+* `JANIS_ENV`, Environment
+
+In order to use S3 Bucket
+
 ### Models
 
-The Entities models must be in `path/to/root/[MS_PATH]/models/[ENTITY].js`. It are the same for list, get or save in your microservice.
+* First needs the `ModelExport` from the package, in `path/to/root/[MS_PATH]/models/export.js`
 
-* `MS_PATH` : environment variable. Usually `src`.
-* `ENTITY` : entity name
+#### Example
+
+```js
+'use strict';
+
+const { ModelExport } = require('@janiscommerce/export');
+
+module.exports = ModelExport;
+```
+
+* The Entities models must be in `path/to/root/[MS_PATH]/models/[ENTITY].js`. It are the same for list, get or save in your microservice.
+  * `MS_PATH` : environment variable. Usually `src`.
+  * `ENTITY` : entity name
 
 #### Example
 
@@ -126,7 +146,7 @@ class CatController extends ControllerExport {
 		return ['name']; // Will try to exclude 'name' field, but because 'fields' method has elements it will be ignored
   }
 
-  async formatByPage(items) {
+  async format(item) {
     return {...item, userProfile: this.session.profileId };
   }
 
@@ -169,7 +189,7 @@ There are a few options to customize the exports.
 
 * *async* `postSaveHook(exportDocumentSaved)`.
 
-  Params: `exportDocument`, the export options.
+  Params: `exportDocumentSaved`, the export options.
   Method to do something after the export process.
 
 #### Example
