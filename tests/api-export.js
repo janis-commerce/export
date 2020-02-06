@@ -75,6 +75,14 @@ describe('API Export', () => {
 
 	context('When no Entity Model exist', () => {
 
+		before(() => {
+			mockRequire(exportModelPath, ModelExport);
+		});
+
+		after(() => {
+			mockRequire.stop(exportModelPath);
+		});
+
 		ApiTest(ApiExport, '/api/export', [
 			{
 				description: 'Should return 400',
@@ -92,11 +100,13 @@ describe('API Export', () => {
 	context('When no Entity Controller exist', () => {
 
 		before(() => {
+			mockRequire(exportModelPath, ModelExport);
 			mockRequire(fakeModelPath, FakeModel);
 		});
 
 		after(() => {
 			mockRequire.stop(fakeModelPath);
+			mockRequire.stop(exportModelPath);
 		});
 
 
