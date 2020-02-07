@@ -107,15 +107,15 @@ describe('Created Export Listener', async () => {
 				responseCode: 200
 			},
 			{
-				description: 'Should return 500 but used preSaveHook method',
+				description: 'Should return 500 but used preProcess method',
 				session: true,
 				before: sandbox => {
 					sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
-					sandbox.stub(CreatedListener.prototype, 'preSaveHook').rejects(new Error('Some Error'));
+					sandbox.stub(CreatedListener.prototype, 'preProcess').rejects(new Error('Some Error'));
 				},
 				after: sandbox => {
 					sandbox.assert.calledOnce(ModelExport.prototype.get);
-					sandbox.assert.calledOnce(CreatedListener.prototype.preSaveHook);
+					sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
 				},
 				event: { ...validEvent },
 				responseCode: 500
@@ -125,8 +125,8 @@ describe('Created Export Listener', async () => {
 				session: true,
 				before: sandbox => {
 					sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
-					sandbox.spy(CreatedListener.prototype, 'preSaveHook');
-					sandbox.spy(CreatedListener.prototype, 'postSaveHook');
+					sandbox.spy(CreatedListener.prototype, 'preProcess');
+					sandbox.spy(CreatedListener.prototype, 'postProcess');
 
 					sandbox.stub(FakeModel.prototype, 'get').returns([]);
 
@@ -135,8 +135,8 @@ describe('Created Export Listener', async () => {
 				},
 				after: sandbox => {
 					sandbox.assert.calledOnce(ModelExport.prototype.get);
-					sandbox.assert.calledOnce(CreatedListener.prototype.preSaveHook);
-					sandbox.assert.calledOnce(CreatedListener.prototype.postSaveHook);
+					sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
+					sandbox.assert.calledOnce(CreatedListener.prototype.postProcess);
 					sandbox.assert.calledOnce(FakeModel.prototype.get);
 					sandbox.assert.calledOnce(ModelExport.prototype.save);
 					sandbox.assert.calledOnce(EventEmitter.emit);
@@ -165,8 +165,8 @@ describe('Created Export Listener', async () => {
 				session: true,
 				before: sandbox => {
 					sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
-					sandbox.spy(CreatedListener.prototype, 'preSaveHook');
-					sandbox.spy(CreatedListener.prototype, 'postSaveHook');
+					sandbox.spy(CreatedListener.prototype, 'preProcess');
+					sandbox.spy(CreatedListener.prototype, 'postProcess');
 
 					sandbox.spy(FakeController.prototype, 'formatByPage');
 					sandbox.spy(FakeController.prototype, 'formatByFile');
@@ -191,7 +191,7 @@ describe('Created Export Listener', async () => {
 				},
 				after: sandbox => {
 					sandbox.assert.calledOnce(ModelExport.prototype.get);
-					sandbox.assert.calledOnce(CreatedListener.prototype.preSaveHook);
+					sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
 					sandbox.assert.callCount(FakeModel.prototype.get, 5);
 					sandbox.assert.calledOnce(FakeModel.prototype.getTotals);
 					sandbox.assert.callCount(FakeController.prototype.formatByPage, 5);
@@ -199,7 +199,7 @@ describe('Created Export Listener', async () => {
 					sandbox.assert.calledThrice(ExcelJS.Workbook.prototype.xlsx.writeBuffer);
 					sandbox.assert.calledThrice(S3.putObject);
 					sandbox.assert.calledOnce(ModelExport.prototype.save);
-					sandbox.assert.calledOnce(CreatedListener.prototype.postSaveHook);
+					sandbox.assert.calledOnce(CreatedListener.prototype.postProcess);
 					sandbox.assert.calledOnce(EventEmitter.emit);
 				},
 				event: { ...validEvent },
@@ -210,8 +210,8 @@ describe('Created Export Listener', async () => {
 				session: true,
 				before: sandbox => {
 					sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
-					sandbox.spy(CreatedListener.prototype, 'preSaveHook');
-					sandbox.spy(CreatedListener.prototype, 'postSaveHook');
+					sandbox.spy(CreatedListener.prototype, 'preProcess');
+					sandbox.spy(CreatedListener.prototype, 'postProcess');
 
 					sandbox.spy(FakeController.prototype, 'formatByPage');
 					sandbox.spy(FakeController.prototype, 'formatByFile');
@@ -236,7 +236,7 @@ describe('Created Export Listener', async () => {
 				},
 				after: sandbox => {
 					sandbox.assert.calledOnce(ModelExport.prototype.get);
-					sandbox.assert.calledOnce(CreatedListener.prototype.preSaveHook);
+					sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
 					sandbox.assert.callCount(FakeModel.prototype.get, 5);
 					sandbox.assert.calledOnce(FakeModel.prototype.getTotals);
 					sandbox.assert.callCount(FakeController.prototype.formatByPage, 5);
@@ -244,7 +244,7 @@ describe('Created Export Listener', async () => {
 					sandbox.assert.calledThrice(ExcelJS.Workbook.prototype.xlsx.writeBuffer);
 					sandbox.assert.notCalled(S3.putObject);
 					sandbox.assert.notCalled(ModelExport.prototype.save);
-					sandbox.assert.notCalled(CreatedListener.prototype.postSaveHook);
+					sandbox.assert.notCalled(CreatedListener.prototype.postProcess);
 					sandbox.assert.notCalled(EventEmitter.emit);
 				},
 				event: { ...validEvent },
@@ -255,8 +255,8 @@ describe('Created Export Listener', async () => {
 				session: true,
 				before: sandbox => {
 					sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
-					sandbox.spy(CreatedListener.prototype, 'preSaveHook');
-					sandbox.spy(CreatedListener.prototype, 'postSaveHook');
+					sandbox.spy(CreatedListener.prototype, 'preProcess');
+					sandbox.spy(CreatedListener.prototype, 'postProcess');
 
 					sandbox.spy(FakeController.prototype, 'formatByPage');
 					sandbox.spy(FakeController.prototype, 'formatByFile');
@@ -281,7 +281,7 @@ describe('Created Export Listener', async () => {
 				},
 				after: sandbox => {
 					sandbox.assert.calledOnce(ModelExport.prototype.get);
-					sandbox.assert.calledOnce(CreatedListener.prototype.preSaveHook);
+					sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
 					sandbox.assert.callCount(FakeModel.prototype.get, 5);
 					sandbox.assert.calledOnce(FakeModel.prototype.getTotals);
 					sandbox.assert.callCount(FakeController.prototype.formatByPage, 5);
@@ -289,7 +289,7 @@ describe('Created Export Listener', async () => {
 					sandbox.assert.calledThrice(ExcelJS.Workbook.prototype.xlsx.writeBuffer);
 					sandbox.assert.calledThrice(S3.putObject);
 					sandbox.assert.notCalled(ModelExport.prototype.save);
-					sandbox.assert.notCalled(CreatedListener.prototype.postSaveHook);
+					sandbox.assert.notCalled(CreatedListener.prototype.postProcess);
 					sandbox.assert.notCalled(EventEmitter.emit);
 				},
 				event: { ...validEvent },
@@ -338,8 +338,8 @@ describe('Created Export Listener', async () => {
 				before: sandbox => {
 
 					sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
-					sandbox.spy(CreatedListener.prototype, 'preSaveHook');
-					sandbox.spy(CreatedListener.prototype, 'postSaveHook');
+					sandbox.spy(CreatedListener.prototype, 'preProcess');
+					sandbox.spy(CreatedListener.prototype, 'postProcess');
 
 					sandbox.spy(FakeController.prototype, 'formatByPage');
 					sandbox.spy(FakeController.prototype, 'formatByFile');
@@ -366,7 +366,7 @@ describe('Created Export Listener', async () => {
 				},
 				after: sandbox => {
 					sandbox.assert.calledOnce(ModelExport.prototype.get);
-					sandbox.assert.calledOnce(CreatedListener.prototype.preSaveHook);
+					sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
 					sandbox.assert.callCount(FakeModel.prototype.get, 5);
 					sandbox.assert.calledOnce(FakeModel.prototype.getTotals);
 					sandbox.assert.callCount(FakeController.prototype.formatByPage, 5);
@@ -376,7 +376,7 @@ describe('Created Export Listener', async () => {
 					sandbox.assert.calledThrice(ExcelJS.Workbook.prototype.xlsx.writeBuffer);
 					sandbox.assert.calledThrice(S3.putObject);
 					sandbox.assert.calledOnce(ModelExport.prototype.save);
-					sandbox.assert.calledOnce(CreatedListener.prototype.postSaveHook);
+					sandbox.assert.calledOnce(CreatedListener.prototype.postProcess);
 					sandbox.assert.calledOnce(EventEmitter.emit);
 				},
 				event: { ...validEvent },
@@ -425,8 +425,8 @@ describe('Created Export Listener', async () => {
 				before: sandbox => {
 
 					sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
-					sandbox.spy(CreatedListener.prototype, 'preSaveHook');
-					sandbox.spy(CreatedListener.prototype, 'postSaveHook');
+					sandbox.spy(CreatedListener.prototype, 'preProcess');
+					sandbox.spy(CreatedListener.prototype, 'postProcess');
 
 					sandbox.spy(FakeController.prototype, 'formatByPage');
 					sandbox.spy(FakeController.prototype, 'formatByFile');
@@ -453,7 +453,7 @@ describe('Created Export Listener', async () => {
 				},
 				after: sandbox => {
 					sandbox.assert.calledOnce(ModelExport.prototype.get);
-					sandbox.assert.calledOnce(CreatedListener.prototype.preSaveHook);
+					sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
 					sandbox.assert.callCount(FakeModel.prototype.get, 5);
 					sandbox.assert.calledOnce(FakeModel.prototype.getTotals);
 					sandbox.assert.callCount(FakeController.prototype.formatByPage, 5);
@@ -463,7 +463,7 @@ describe('Created Export Listener', async () => {
 					sandbox.assert.calledThrice(ExcelJS.Workbook.prototype.xlsx.writeBuffer);
 					sandbox.assert.calledThrice(S3.putObject);
 					sandbox.assert.calledOnce(ModelExport.prototype.save);
-					sandbox.assert.calledOnce(CreatedListener.prototype.postSaveHook);
+					sandbox.assert.calledOnce(CreatedListener.prototype.postProcess);
 					sandbox.assert.calledOnce(EventEmitter.emit);
 				},
 				event: { ...validEvent },
