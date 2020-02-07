@@ -312,6 +312,10 @@ describe('Created Export Listener', async () => {
 			get excludeFields() {
 				return ['id'];
 			}
+
+			format(items) {
+				return items;
+			}
 		}
 
 		before(() => {

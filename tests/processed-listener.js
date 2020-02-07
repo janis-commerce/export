@@ -1,6 +1,7 @@
 'use strict';
 
 const { Mail, MailError } = require('@janiscommerce/mail');
+const S3 = require('@janiscommerce/s3');
 const mockRequire = require('mock-require');
 const path = require('path');
 const logger = require('lllog');
@@ -103,6 +104,10 @@ describe('Processed Export Listener', async () => {
 				sandbox.stub(Mail.prototype, 'setData').returns(Mail.prototype);
 				sandbox.stub(Mail.prototype, 'setTemplateCode').returns(Mail.prototype);
 				sandbox.stub(Mail.prototype, 'send');
+
+				const s3Stub = sandbox.stub(S3, 'getSignedUrl');
+				s3Stub.onCall(0).returns('https://janis-some-service-test.s3.amazonaws.com/exports/defaultClient/terrier-1/cats-001.xlsx');
+				s3Stub.onCall(1).returns('https://janis-some-service-test.s3.amazonaws.com/exports/defaultClient/terrier-1/cats-002.xlsx');
 			},
 			after: sandbox => {
 				sandbox.assert.calledOnce(ModelExport.prototype.get);
@@ -117,8 +122,8 @@ describe('Processed Export Listener', async () => {
 				sandbox.assert.calledWithExactly(Mail.prototype.setSubject, `${exportDocument.entity} Export Files`);
 				sandbox.assert.calledWithExactly(Mail.prototype.setEntity, exportDocument.entity);
 				sandbox.assert.calledWithExactly(Mail.prototype.setData, {
-					'file-part-1': 'https://s3.amazonaws.com/janis-undefined-service-undefined/exports/defaultClient/terrier-1/cats-001.xlsx',
-					'file-part-2': 'https://s3.amazonaws.com/janis-undefined-service-undefined/exports/defaultClient/terrier-1/cats-002.xlsx'
+					files: ['https://janis-some-service-test.s3.amazonaws.com/exports/defaultClient/terrier-1/cats-001.xlsx',
+						'https://janis-some-service-test.s3.amazonaws.com/exports/defaultClient/terrier-1/cats-002.xlsx']
 				});
 				sandbox.assert.calledWithExactly(Mail.prototype.setTemplateCode, 'export');
 			},
