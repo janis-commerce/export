@@ -91,6 +91,11 @@ There are a few options to customize the exports.
   Returns `{ number} `. Default `25000`.
   It is the Document Limit to make the files.
 
+* *getter* `fileUrlExpirationTime`
+
+  Returns `{ number} `. Default `86400`.
+  It is the Expiration Time to be available to download. In Seconds, one day be default.
+
 * *async* `format(item)`.
 
   Returns `{ Object }`. Default `item`.
@@ -131,15 +136,19 @@ const { ControllerExport } = require('@janiscommerce/export');
 class CatController extends ControllerExport {
 
   get pageLimit() {
-		return 100; // Will get pages with 100 documents max
-	}
+    return 100; // Will get pages with 100 documents max
+  }
 
 	get fileLimit() {
 		return 1000000; // Will create files with 1 millon documents max
   }
 
-  get fields() {
-    return ['name']; // Will only include column 'name'
+  get fileLimit() {
+		return 1000000; // Will create files with 1 millon documents max
+  }
+
+  get fileUrlExpirationTime() {
+    return 3600; // Download will be available for 1 hour
   }
 
 	get excludeFields() {
@@ -185,12 +194,22 @@ There are a few options to customize the exports.
 * *async* `preProcess(exportDocument)`.
 
   Params: `exportDocument`, the export options.
-  Method to do something before the export process.
+  Method to do something before the export process starts, like Emit an event or saved in Database or Cache, some other validation.
 
-* *async* `postSaveHook(exportDocumentSaved)`.
+* *async* `postProcess(exportDocumentSaved)`.
 
   Params: `exportDocumentSaved`, the export options.
-  Method to do something after the export process.
+  Method to do something after the export process was created and files are uploaded, like Emit an event or saved in Database or Cache, some other validation.
+
+Export Document have the options which will be used to get the data:
+* `entity`, Entity name
+* `filters`, filters to be used
+* `sortBy`, fields to be sorted by
+* `sortDirection`, sort direction (`asc` or `desc`)
+* `userCreated` ID of User who request the export
+* `userEmail` User Email which will be used to send the data
+* `dateCreated`
+* `dateModified`
 
 #### Example
 
@@ -208,15 +227,15 @@ class ExportCreatedListener extends CreatedListener {
       entity,
       event: 'export-started'.
       id
-    })
+    });
   }
 
-  async postSaveHook({id, entity) {
+  async postSaveHook({id, entity}) {
 		return EventEmitter.emit({
       entity,
       event: 'export-finished'.
       id
-    })
+    });
 	}
 }
 
