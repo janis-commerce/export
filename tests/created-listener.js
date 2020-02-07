@@ -49,6 +49,7 @@ describe('Created Export Listener', async () => {
 
 	const fakeModelPath = path.join(process.cwd(), process.env.MS_PATH || '', 'models', 'cat');
 	const fakeControllerPath = path.join(process.cwd(), process.env.MS_PATH || '', 'controllers', 'export', 'cat');
+	const exportModelPath = path.join(process.cwd(), process.env.MS_PATH || '', 'models', 'export');
 
 	class FakeModel extends Model {}
 
@@ -67,11 +68,13 @@ describe('Created Export Listener', async () => {
 		before(() => {
 			mockRequire(fakeModelPath, FakeModel);
 			mockRequire(fakeControllerPath, FakeController);
+			mockRequire(exportModelPath, ModelExport);
 		});
 
 		after(() => {
 			mockRequire.stop(fakeModelPath);
 			mockRequire.stop(fakeControllerPath);
+			mockRequire.stop(exportModelPath);
 		});
 
 		await EventListenerTest(handler, [
@@ -321,11 +324,13 @@ describe('Created Export Listener', async () => {
 		before(() => {
 			mockRequire(fakeModelPath, FakeModel);
 			mockRequire(fakeControllerPath, FakeController);
+			mockRequire(exportModelPath, ModelExport);
 		});
 
 		after(() => {
 			mockRequire.stop(fakeModelPath);
 			mockRequire.stop(fakeControllerPath);
+			mockRequire.stop(exportModelPath);
 		});
 
 		let excludeFieldsSpy;
@@ -408,11 +413,13 @@ describe('Created Export Listener', async () => {
 		before(() => {
 			mockRequire(fakeModelPath, FakeModel);
 			mockRequire(fakeControllerPath, FakeController);
+			mockRequire(exportModelPath, ModelExport);
 		});
 
 		after(() => {
 			mockRequire.stop(fakeModelPath);
 			mockRequire.stop(fakeControllerPath);
+			mockRequire.stop(exportModelPath);
 		});
 
 		let excludeFieldsSpy;

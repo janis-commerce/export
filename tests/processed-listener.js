@@ -37,15 +37,18 @@ describe('Processed Export Listener', async () => {
 	};
 
 	const fakeControllerPath = path.join(process.cwd(), process.env.MS_PATH || '', 'controllers', 'export', 'cat');
+	const exportModelPath = path.join(process.cwd(), process.env.MS_PATH || '', 'models', 'export');
 
 	class FakeController extends ControllerExport {}
 
 	before(() => {
 		mockRequire(fakeControllerPath, FakeController);
+		mockRequire(exportModelPath, ModelExport);
 	});
 
 	after(() => {
 		mockRequire.stop(fakeControllerPath);
+		mockRequire.stop(exportModelPath);
 	});
 
 
