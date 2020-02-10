@@ -1,0 +1,6 @@
+- service: {your-service}
+  entity: export
+  event: created
+  listeners:
+    - namespace: export
+      method: created-listener

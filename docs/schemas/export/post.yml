@@ -1,0 +1,40 @@
+paths:
+
+  /export:
+    post:
+      x-janis-namespace: export
+      x-janis-method: create
+      operationId: createExport
+      tags:
+        - Export
+      summary: Create an export Document
+      security:
+        - ApiKey: []
+          ApiSecret: []
+          JanisClient: []
+      requestBody:
+        description: The export to create
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Export'
+      responses:
+        '200':
+          description: Export created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The Export document ID
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
