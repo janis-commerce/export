@@ -101,32 +101,31 @@ describe('Processed Export Listener', async () => {
 			session: true,
 			before: sandbox => {
 				sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
-				sandbox.stub(Mail.prototype, 'setTo').returns(Mail.prototype);
-				sandbox.stub(Mail.prototype, 'setSubject').returns(Mail.prototype);
 				sandbox.stub(Mail.prototype, 'setEntity').returns(Mail.prototype);
+				sandbox.stub(Mail.prototype, 'setEntityId').returns(Mail.prototype);
 				sandbox.stub(Mail.prototype, 'setData').returns(Mail.prototype);
 				sandbox.stub(Mail.prototype, 'setTemplateCode').returns(Mail.prototype);
 				sandbox.stub(Mail.prototype, 'send');
 
 				const s3Stub = sandbox.stub(S3, 'getSignedUrl');
-				s3Stub.onCall(0).returns('https://janis-some-service-test.s3.amazonaws.com/exports/defaultClient/terrier-1/cats-001.xlsx');
-				s3Stub.onCall(1).returns('https://janis-some-service-test.s3.amazonaws.com/exports/defaultClient/terrier-1/cats-002.xlsx');
+				s3Stub.onCall(0).returns('https://janis-some-service-test.s3.amazonaws.com/exports/defaultClient/terrier-1/cats-export-doc-1-001.xlsx');
+				s3Stub.onCall(1).returns('https://janis-some-service-test.s3.amazonaws.com/exports/defaultClient/terrier-1/cats-export-doc-1-002.xlsx');
 			},
 			after: sandbox => {
 				sandbox.assert.calledOnce(ModelExport.prototype.get);
-				sandbox.assert.calledOnce(Mail.prototype.setTo);
-				sandbox.assert.calledOnce(Mail.prototype.setSubject);
+				sandbox.assert.calledOnce(Mail.prototype.setEntityId);
 				sandbox.assert.calledOnce(Mail.prototype.setEntity);
 				sandbox.assert.calledOnce(Mail.prototype.setData);
 				sandbox.assert.calledOnce(Mail.prototype.setTemplateCode);
 				sandbox.assert.calledOnce(Mail.prototype.send);
 
-				sandbox.assert.calledWithExactly(Mail.prototype.setTo, exportDocument.userEmail);
-				sandbox.assert.calledWithExactly(Mail.prototype.setSubject, `${exportDocument.entity} Export Files`);
-				sandbox.assert.calledWithExactly(Mail.prototype.setEntity, exportDocument.entity);
+				sandbox.assert.calledWithExactly(Mail.prototype.setEntity, 'export');
+				sandbox.assert.calledWithExactly(Mail.prototype.setEntityId, exportDocument.id);
 				sandbox.assert.calledWithExactly(Mail.prototype.setData, {
-					files: ['https://janis-some-service-test.s3.amazonaws.com/exports/defaultClient/terrier-1/cats-001.xlsx',
-						'https://janis-some-service-test.s3.amazonaws.com/exports/defaultClient/terrier-1/cats-002.xlsx']
+					entity: exportDocument.entity,
+					userEmail: exportDocument.userEmail,
+					files: ['https://janis-some-service-test.s3.amazonaws.com/exports/defaultClient/terrier-1/cats-export-doc-1-001.xlsx',
+						'https://janis-some-service-test.s3.amazonaws.com/exports/defaultClient/terrier-1/cats-export-doc-1-002.xlsx']
 				});
 				sandbox.assert.calledWithExactly(Mail.prototype.setTemplateCode, 'export');
 			},
@@ -138,17 +137,15 @@ describe('Processed Export Listener', async () => {
 			session: true,
 			before: sandbox => {
 				sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
-				sandbox.stub(Mail.prototype, 'setTo').returns(Mail.prototype);
-				sandbox.stub(Mail.prototype, 'setSubject').returns(Mail.prototype);
 				sandbox.stub(Mail.prototype, 'setEntity').returns(Mail.prototype);
+				sandbox.stub(Mail.prototype, 'setEntityId').returns(Mail.prototype);
 				sandbox.stub(Mail.prototype, 'setData').returns(Mail.prototype);
 				sandbox.stub(Mail.prototype, 'setTemplateCode').returns(Mail.prototype);
 				sandbox.stub(Mail.prototype, 'send').rejects(new Error('Mails Failed'));
 			},
 			after: sandbox => {
 				sandbox.assert.calledOnce(ModelExport.prototype.get);
-				sandbox.assert.calledOnce(Mail.prototype.setTo);
-				sandbox.assert.calledOnce(Mail.prototype.setSubject);
+				sandbox.assert.calledOnce(Mail.prototype.setEntityId);
 				sandbox.assert.calledOnce(Mail.prototype.setEntity);
 				sandbox.assert.calledOnce(Mail.prototype.setData);
 				sandbox.assert.calledOnce(Mail.prototype.setTemplateCode);
@@ -162,9 +159,8 @@ describe('Processed Export Listener', async () => {
 			session: true,
 			before: sandbox => {
 				sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
-				sandbox.stub(Mail.prototype, 'setTo').returns(Mail.prototype);
-				sandbox.stub(Mail.prototype, 'setSubject').returns(Mail.prototype);
 				sandbox.stub(Mail.prototype, 'setEntity').returns(Mail.prototype);
+				sandbox.stub(Mail.prototype, 'setEntityId').returns(Mail.prototype);
 				sandbox.stub(Mail.prototype, 'setData').returns(Mail.prototype);
 				sandbox.stub(Mail.prototype, 'setTemplateCode').returns(Mail.prototype);
 
@@ -175,8 +171,7 @@ describe('Processed Export Listener', async () => {
 			},
 			after: sandbox => {
 				sandbox.assert.calledOnce(ModelExport.prototype.get);
-				sandbox.assert.calledOnce(Mail.prototype.setTo);
-				sandbox.assert.calledOnce(Mail.prototype.setSubject);
+				sandbox.assert.calledOnce(Mail.prototype.setEntityId);
 				sandbox.assert.calledOnce(Mail.prototype.setEntity);
 				sandbox.assert.calledOnce(Mail.prototype.setData);
 				sandbox.assert.calledOnce(Mail.prototype.setTemplateCode);
