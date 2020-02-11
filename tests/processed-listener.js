@@ -142,6 +142,8 @@ describe('Processed Export Listener', async () => {
 				sandbox.stub(Mail.prototype, 'setData').returnsThis();
 				sandbox.stub(Mail.prototype, 'setTemplateCode').returnsThis();
 				sandbox.stub(Mail.prototype, 'send').rejects(new Error('Mails Failed'));
+
+				sandbox.stub(S3, 'getSignedUrl');
 			},
 			after: sandbox => {
 				sandbox.assert.calledOnce(ModelExport.prototype.get);
@@ -163,6 +165,8 @@ describe('Processed Export Listener', async () => {
 				sandbox.stub(Mail.prototype, 'setEntityId').returnsThis();
 				sandbox.stub(Mail.prototype, 'setData').returnsThis();
 				sandbox.stub(Mail.prototype, 'setTemplateCode').returnsThis();
+
+				sandbox.stub(S3, 'getSignedUrl');
 
 				const MsCallError = new Error('Mails Failed');
 				MsCallError.code = MailError.codes.MS_CALL_ERROR;
