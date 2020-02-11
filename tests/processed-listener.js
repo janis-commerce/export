@@ -101,10 +101,10 @@ describe('Processed Export Listener', async () => {
 			session: true,
 			before: sandbox => {
 				sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
-				sandbox.stub(Mail.prototype, 'setEntity').returns(Mail.prototype);
-				sandbox.stub(Mail.prototype, 'setEntityId').returns(Mail.prototype);
-				sandbox.stub(Mail.prototype, 'setData').returns(Mail.prototype);
-				sandbox.stub(Mail.prototype, 'setTemplateCode').returns(Mail.prototype);
+				sandbox.stub(Mail.prototype, 'setEntity').returnsThis();
+				sandbox.stub(Mail.prototype, 'setEntityId').returnsThis();
+				sandbox.stub(Mail.prototype, 'setData').returnsThis();
+				sandbox.stub(Mail.prototype, 'setTemplateCode').returnsThis();
 				sandbox.stub(Mail.prototype, 'send');
 
 				const s3Stub = sandbox.stub(S3, 'getSignedUrl');
@@ -137,10 +137,10 @@ describe('Processed Export Listener', async () => {
 			session: true,
 			before: sandbox => {
 				sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
-				sandbox.stub(Mail.prototype, 'setEntity').returns(Mail.prototype);
-				sandbox.stub(Mail.prototype, 'setEntityId').returns(Mail.prototype);
-				sandbox.stub(Mail.prototype, 'setData').returns(Mail.prototype);
-				sandbox.stub(Mail.prototype, 'setTemplateCode').returns(Mail.prototype);
+				sandbox.stub(Mail.prototype, 'setEntity').returnsThis();
+				sandbox.stub(Mail.prototype, 'setEntityId').returnsThis();
+				sandbox.stub(Mail.prototype, 'setData').returnsThis();
+				sandbox.stub(Mail.prototype, 'setTemplateCode').returnsThis();
 				sandbox.stub(Mail.prototype, 'send').rejects(new Error('Mails Failed'));
 			},
 			after: sandbox => {
@@ -159,10 +159,10 @@ describe('Processed Export Listener', async () => {
 			session: true,
 			before: sandbox => {
 				sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
-				sandbox.stub(Mail.prototype, 'setEntity').returns(Mail.prototype);
-				sandbox.stub(Mail.prototype, 'setEntityId').returns(Mail.prototype);
-				sandbox.stub(Mail.prototype, 'setData').returns(Mail.prototype);
-				sandbox.stub(Mail.prototype, 'setTemplateCode').returns(Mail.prototype);
+				sandbox.stub(Mail.prototype, 'setEntity').returnsThis();
+				sandbox.stub(Mail.prototype, 'setEntityId').returnsThis();
+				sandbox.stub(Mail.prototype, 'setData').returnsThis();
+				sandbox.stub(Mail.prototype, 'setTemplateCode').returnsThis();
 
 				const MsCallError = new Error('Mails Failed');
 				MsCallError.code = MailError.codes.MS_CALL_ERROR;
