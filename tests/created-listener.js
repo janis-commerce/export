@@ -100,11 +100,29 @@ describe('Created Export Listener', async () => {
 				description: 'Should return 200 if the export document cannot be found',
 				session: true,
 				before: sandbox => {
+					sandbox.stub(ModelExport.prototype, 'update').returns(true);
 					sandbox.stub(ModelExport.prototype, 'get').returns([]);
 				},
 				after: sandbox => {
-					sandbox.assert.calledOnce(ModelExport.prototype.get);
-					sandbox.assert.calledWithExactly(ModelExport.prototype.get, { filters: { id: validEvent.id } });
+					sandbox.assert.calledOnceWithExactly(ModelExport.prototype.update,
+						{ status: ModelExport.statuses.processing },
+						{ id: validEvent.id, status: ModelExport.statuses.pending }
+					);
+					sandbox.assert.calledOnceWithExactly(ModelExport.prototype.get, { filters: { id: validEvent.id, status: ModelExport.statuses.processing } });
+				},
+				event: { ...validEvent },
+				responseCode: 200
+			},
+			{
+				description: 'Should return 200 if can\'t update the export document status',
+				session: true,
+				before: sandbox => {
+					sandbox.stub(ModelExport.prototype, 'update').returns(false);
+					sandbox.stub(ModelExport.prototype, 'get');
+				},
+				after: sandbox => {
+					sandbox.assert.calledOnce(ModelExport.prototype.update);
+					sandbox.assert.notCalled(ModelExport.prototype.get);
 				},
 				event: { ...validEvent },
 				responseCode: 200
@@ -113,10 +131,12 @@ describe('Created Export Listener', async () => {
 				description: 'Should return 500 but used preProcess method',
 				session: true,
 				before: sandbox => {
+					sandbox.stub(ModelExport.prototype, 'update').returns(true);
 					sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
 					sandbox.stub(CreatedListener.prototype, 'preProcess').rejects(new Error('Some Error'));
 				},
 				after: sandbox => {
+					sandbox.assert.calledOnce(ModelExport.prototype.update);
 					sandbox.assert.calledOnce(ModelExport.prototype.get);
 					sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
 				},
@@ -127,6 +147,7 @@ describe('Created Export Listener', async () => {
 				description: 'Should return 200 when no files to generate',
 				session: true,
 				before: sandbox => {
+					sandbox.stub(ModelExport.prototype, 'update').returns(true);
 					sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
 					sandbox.spy(CreatedListener.prototype, 'preProcess');
 					sandbox.spy(CreatedListener.prototype, 'postProcess');
@@ -137,14 +158,17 @@ describe('Created Export Listener', async () => {
 					sandbox.stub(EventEmitter, 'emit');
 				},
 				after: sandbox => {
+					sandbox.assert.calledOnce(ModelExport.prototype.update);
 					sandbox.assert.calledOnce(ModelExport.prototype.get);
 					sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
 					sandbox.assert.calledOnce(CreatedListener.prototype.postProcess);
-					sandbox.assert.calledOnce(FakeModel.prototype.get);
-					sandbox.assert.calledOnce(ModelExport.prototype.save);
-					sandbox.assert.calledOnce(EventEmitter.emit);
 
-					sandbox.assert.calledWithExactly(FakeModel.prototype.get, {
+					sandbox.assert.calledOnceWithExactly(ModelExport.prototype.save, {
+						...exportDocument,
+						status: ModelExport.statuses.processed
+					});
+
+					sandbox.assert.calledOnceWithExactly(FakeModel.prototype.get, {
 						filters: { legs: 4 },
 						order: {
 							bornYear: 'desc'
@@ -153,7 +177,7 @@ describe('Created Export Listener', async () => {
 						limit: 1
 					});
 
-					sandbox.assert.calledWithExactly(EventEmitter.emit, {
+					sandbox.assert.calledOnceWithExactly(EventEmitter.emit, {
 						entity: 'export',
 						event: 'processed',
 						id: 'export-doc-1',
@@ -167,6 +191,7 @@ describe('Created Export Listener', async () => {
 				description: 'Should return 200 when generate files and upload to S3',
 				session: true,
 				before: sandbox => {
+					sandbox.stub(ModelExport.prototype, 'update').returns(true);
 					sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
 					sandbox.spy(CreatedListener.prototype, 'preProcess');
 					sandbox.spy(CreatedListener.prototype, 'postProcess');
@@ -177,11 +202,9 @@ describe('Created Export Listener', async () => {
 					const items = makeItems(5);
 					const getModelStub = sandbox.stub(FakeModel.prototype, 'get');
 
-					getModelStub.onCall(0).returns([items[0]]);
-					getModelStub.onCall(1).returns([items[1]]);
-					getModelStub.onCall(2).returns([items[2]]);
-					getModelStub.onCall(3).returns([items[3]]);
-					getModelStub.onCall(4).returns([items[4]]);
+					items.forEach((item, i) => {
+						getModelStub.onCall(i).returns([item]);
+					});
 
 					sandbox.stub(FakeModel.prototype, 'getTotals').returns({
 						pages: 5
@@ -193,6 +216,7 @@ describe('Created Export Listener', async () => {
 					sandbox.stub(S3, 'putObject');
 				},
 				after: sandbox => {
+					sandbox.assert.calledOnce(ModelExport.prototype.update);
 					sandbox.assert.calledOnce(ModelExport.prototype.get);
 					sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
 					sandbox.assert.callCount(FakeModel.prototype.get, 5);
@@ -212,6 +236,7 @@ describe('Created Export Listener', async () => {
 				description: 'Should return 500 when fails generating files',
 				session: true,
 				before: sandbox => {
+					sandbox.stub(ModelExport.prototype, 'update').returns(true);
 					sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
 					sandbox.spy(CreatedListener.prototype, 'preProcess');
 					sandbox.spy(CreatedListener.prototype, 'postProcess');
@@ -222,11 +247,9 @@ describe('Created Export Listener', async () => {
 					const items = makeItems(5);
 					const getModelStub = sandbox.stub(FakeModel.prototype, 'get');
 
-					getModelStub.onCall(0).returns([items[0]]);
-					getModelStub.onCall(1).returns([items[1]]);
-					getModelStub.onCall(2).returns([items[2]]);
-					getModelStub.onCall(3).returns([items[3]]);
-					getModelStub.onCall(4).returns([items[4]]);
+					items.forEach((item, i) => {
+						getModelStub.onCall(i).returns([item]);
+					});
 
 					sandbox.stub(FakeModel.prototype, 'getTotals').returns({
 						pages: 5
@@ -238,6 +261,7 @@ describe('Created Export Listener', async () => {
 					sandbox.stub(S3, 'putObject');
 				},
 				after: sandbox => {
+					sandbox.assert.calledOnce(ModelExport.prototype.update);
 					sandbox.assert.calledOnce(ModelExport.prototype.get);
 					sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
 					sandbox.assert.callCount(FakeModel.prototype.get, 5);
@@ -257,6 +281,7 @@ describe('Created Export Listener', async () => {
 				description: 'Should return 500 when fails uploading S3',
 				session: true,
 				before: sandbox => {
+					sandbox.stub(ModelExport.prototype, 'update').returns(true);
 					sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
 					sandbox.spy(CreatedListener.prototype, 'preProcess');
 					sandbox.spy(CreatedListener.prototype, 'postProcess');
@@ -267,11 +292,9 @@ describe('Created Export Listener', async () => {
 					const items = makeItems(5);
 					const getModelStub = sandbox.stub(FakeModel.prototype, 'get');
 
-					getModelStub.onCall(0).returns([items[0]]);
-					getModelStub.onCall(1).returns([items[1]]);
-					getModelStub.onCall(2).returns([items[2]]);
-					getModelStub.onCall(3).returns([items[3]]);
-					getModelStub.onCall(4).returns([items[4]]);
+					items.forEach((item, i) => {
+						getModelStub.onCall(i).returns([item]);
+					});
 
 					sandbox.stub(FakeModel.prototype, 'getTotals').returns({
 						pages: 5
@@ -283,6 +306,7 @@ describe('Created Export Listener', async () => {
 					sandbox.stub(S3, 'putObject').rejects(new Error('S3 fails'));
 				},
 				after: sandbox => {
+					sandbox.assert.calledOnce(ModelExport.prototype.update);
 					sandbox.assert.calledOnce(ModelExport.prototype.get);
 					sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
 					sandbox.assert.callCount(FakeModel.prototype.get, 5);
@@ -341,7 +365,7 @@ describe('Created Export Listener', async () => {
 				description: 'Should return 200 and exclude the field \'id\'',
 				session: true,
 				before: sandbox => {
-
+					sandbox.stub(ModelExport.prototype, 'update').returns(true);
 					sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
 					sandbox.spy(CreatedListener.prototype, 'preProcess');
 					sandbox.spy(CreatedListener.prototype, 'postProcess');
@@ -354,11 +378,9 @@ describe('Created Export Listener', async () => {
 					const items = makeItems(5);
 					const getModelStub = sandbox.stub(FakeModel.prototype, 'get');
 
-					getModelStub.onCall(0).returns([items[0]]);
-					getModelStub.onCall(1).returns([items[1]]);
-					getModelStub.onCall(2).returns([items[2]]);
-					getModelStub.onCall(3).returns([items[3]]);
-					getModelStub.onCall(4).returns([items[4]]);
+					items.forEach((item, i) => {
+						getModelStub.onCall(i).returns([item]);
+					});
 
 					sandbox.stub(FakeModel.prototype, 'getTotals').returns({
 						pages: 5
@@ -370,6 +392,7 @@ describe('Created Export Listener', async () => {
 					sandbox.stub(S3, 'putObject');
 				},
 				after: sandbox => {
+					sandbox.assert.calledOnce(ModelExport.prototype.update);
 					sandbox.assert.calledOnce(ModelExport.prototype.get);
 					sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
 					sandbox.assert.callCount(FakeModel.prototype.get, 5);
@@ -430,7 +453,7 @@ describe('Created Export Listener', async () => {
 				description: 'Should return 200 used include only \'bornYear\' field and not use exclude Files',
 				session: true,
 				before: sandbox => {
-
+					sandbox.stub(ModelExport.prototype, 'update').returns(true);
 					sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
 					sandbox.spy(CreatedListener.prototype, 'preProcess');
 					sandbox.spy(CreatedListener.prototype, 'postProcess');
@@ -443,11 +466,9 @@ describe('Created Export Listener', async () => {
 					const items = makeItems(5);
 					const getModelStub = sandbox.stub(FakeModel.prototype, 'get');
 
-					getModelStub.onCall(0).returns([items[0]]);
-					getModelStub.onCall(1).returns([items[1]]);
-					getModelStub.onCall(2).returns([items[2]]);
-					getModelStub.onCall(3).returns([items[3]]);
-					getModelStub.onCall(4).returns([items[4]]);
+					items.forEach((item, i) => {
+						getModelStub.onCall(i).returns([item]);
+					});
 
 					sandbox.stub(FakeModel.prototype, 'getTotals').returns({
 						pages: 5
@@ -459,6 +480,7 @@ describe('Created Export Listener', async () => {
 					sandbox.stub(S3, 'putObject');
 				},
 				after: sandbox => {
+					sandbox.assert.calledOnce(ModelExport.prototype.update);
 					sandbox.assert.calledOnce(ModelExport.prototype.get);
 					sandbox.assert.calledOnce(CreatedListener.prototype.preProcess);
 					sandbox.assert.callCount(FakeModel.prototype.get, 5);

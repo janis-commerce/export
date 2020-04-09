@@ -218,7 +218,8 @@ describe('API Export', () => {
 						sortBy: 'name',
 						sortDirection: 'desc',
 						userCreated: 2,
-						userEmail: 'user@email.com'
+						userEmail: 'user@email.com',
+						status: ModelExport.statuses.pending
 					});
 
 					sandbox.assert.calledWithExactly(EventEmitter.emit, {
@@ -251,7 +252,8 @@ describe('API Export', () => {
 					sandbox.assert.calledWithExactly(ModelExport.prototype.insert, {
 						entity: 'some-entity',
 						userCreated: 2,
-						userEmail: 'user@email.com'
+						userEmail: 'user@email.com',
+						status: ModelExport.statuses.pending
 					});
 				}
 			},
@@ -282,7 +284,8 @@ describe('API Export', () => {
 						sortBy: 'name',
 						sortDirection: 'asc',
 						userCreated: 2,
-						userEmail: 'user@email.com'
+						userEmail: 'user@email.com',
+						status: ModelExport.statuses.pending
 					});
 				}
 			}

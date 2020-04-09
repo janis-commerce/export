@@ -51,7 +51,6 @@ describe('Processed Export Listener', async () => {
 		mockRequire.stop(exportModelPath);
 	});
 
-
 	await EventListenerTest(handler, [
 		{
 			description: 'Should return 400 if the event has no client',
@@ -75,11 +74,29 @@ describe('Processed Export Listener', async () => {
 			description: 'Should return 200 if the export document cannot be found',
 			session: true,
 			before: sandbox => {
+				sandbox.stub(ModelExport.prototype, 'update').returns(true);
 				sandbox.stub(ModelExport.prototype, 'get').returns([]);
 			},
 			after: sandbox => {
-				sandbox.assert.calledOnce(ModelExport.prototype.get);
-				sandbox.assert.calledWithExactly(ModelExport.prototype.get, { filters: { id: validEvent.id } });
+				sandbox.assert.calledOnceWithExactly(ModelExport.prototype.update,
+					{ status: ModelExport.statuses.sending },
+					{ id: validEvent.id, status: ModelExport.statuses.processed }
+				);
+				sandbox.assert.calledOnceWithExactly(ModelExport.prototype.get, { filters: { id: validEvent.id, status: ModelExport.statuses.sending } });
+			},
+			event: { ...validEvent },
+			responseCode: 200
+		},
+		{
+			description: 'Should return 200 if can\'t update the export document status',
+			session: true,
+			before: sandbox => {
+				sandbox.stub(ModelExport.prototype, 'update').returns(false);
+				sandbox.stub(ModelExport.prototype, 'get');
+			},
+			after: sandbox => {
+				sandbox.assert.calledOnce(ModelExport.prototype.update);
+				sandbox.assert.notCalled(ModelExport.prototype.get);
 			},
 			event: { ...validEvent },
 			responseCode: 200
@@ -88,9 +105,11 @@ describe('Processed Export Listener', async () => {
 			description: 'Should return 200 if the export Document has no files',
 			session: true,
 			before: sandbox => {
+				sandbox.stub(ModelExport.prototype, 'update').returns(true);
 				sandbox.stub(ModelExport.prototype, 'get').returns([{ id: validEvent.id }]);
 			},
 			after: sandbox => {
+				sandbox.assert.calledOnce(ModelExport.prototype.update);
 				sandbox.assert.calledOnce(ModelExport.prototype.get);
 			},
 			event: { ...validEvent },
@@ -100,6 +119,7 @@ describe('Processed Export Listener', async () => {
 			description: 'Should return 200 if Mail is send succesfully',
 			session: true,
 			before: sandbox => {
+				sandbox.stub(ModelExport.prototype, 'update').returns(true);
 				sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
 				sandbox.stub(Mail.prototype, 'setEntity').returnsThis();
 				sandbox.stub(Mail.prototype, 'setEntityId').returnsThis();
@@ -113,15 +133,22 @@ describe('Processed Export Listener', async () => {
 			},
 			after: sandbox => {
 				sandbox.assert.calledOnce(ModelExport.prototype.get);
-				sandbox.assert.calledOnce(Mail.prototype.setEntityId);
-				sandbox.assert.calledOnce(Mail.prototype.setEntity);
-				sandbox.assert.calledOnce(Mail.prototype.setData);
 				sandbox.assert.calledOnce(Mail.prototype.setTemplateCode);
 				sandbox.assert.calledOnce(Mail.prototype.send);
 
-				sandbox.assert.calledWithExactly(Mail.prototype.setEntity, 'export');
-				sandbox.assert.calledWithExactly(Mail.prototype.setEntityId, exportDocument.id);
-				sandbox.assert.calledWithExactly(Mail.prototype.setData, {
+				sandbox.assert.calledTwice(ModelExport.prototype.update);
+				sandbox.assert.calledWithExactly(ModelExport.prototype.update.getCall(0),
+					{ status: ModelExport.statuses.sending },
+					{ id: validEvent.id, status: ModelExport.statuses.processed }
+				);
+				sandbox.assert.calledWithExactly(ModelExport.prototype.update.getCall(1),
+					{ status: ModelExport.statuses.sent },
+					{ id: validEvent.id, status: ModelExport.statuses.sending }
+				);
+
+				sandbox.assert.calledOnceWithExactly(Mail.prototype.setEntity, 'export');
+				sandbox.assert.calledOnceWithExactly(Mail.prototype.setEntityId, exportDocument.id);
+				sandbox.assert.calledOnceWithExactly(Mail.prototype.setData, {
 					entity: exportDocument.entity,
 					userEmail: exportDocument.userEmail,
 					files: ['https://janis-some-service-test.s3.amazonaws.com/exports/defaultClient/terrier-1/cats-export-doc-1-001.xlsx',
@@ -136,6 +163,7 @@ describe('Processed Export Listener', async () => {
 			description: 'Should return 200 if Mail fail',
 			session: true,
 			before: sandbox => {
+				sandbox.stub(ModelExport.prototype, 'update').returns(true);
 				sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
 				sandbox.stub(Mail.prototype, 'setEntity').returnsThis();
 				sandbox.stub(Mail.prototype, 'setEntityId').returnsThis();
@@ -152,6 +180,16 @@ describe('Processed Export Listener', async () => {
 				sandbox.assert.calledOnce(Mail.prototype.setData);
 				sandbox.assert.calledOnce(Mail.prototype.setTemplateCode);
 				sandbox.assert.calledOnce(Mail.prototype.send);
+
+				sandbox.assert.calledTwice(ModelExport.prototype.update);
+				sandbox.assert.calledWithExactly(ModelExport.prototype.update.getCall(0),
+					{ status: ModelExport.statuses.sending },
+					{ id: validEvent.id, status: ModelExport.statuses.processed }
+				);
+				sandbox.assert.calledWithExactly(ModelExport.prototype.update.getCall(1),
+					{ status: ModelExport.statuses.sendingError },
+					{ id: validEvent.id, status: ModelExport.statuses.sending }
+				);
 			},
 			event: { ...validEvent },
 			responseCode: 200
@@ -160,6 +198,7 @@ describe('Processed Export Listener', async () => {
 			description: 'Should return 500 if Mail fail when Microservice Call',
 			session: true,
 			before: sandbox => {
+				sandbox.stub(ModelExport.prototype, 'update').returns(true);
 				sandbox.stub(ModelExport.prototype, 'get').returns([exportDocument]);
 				sandbox.stub(Mail.prototype, 'setEntity').returnsThis();
 				sandbox.stub(Mail.prototype, 'setEntityId').returnsThis();
@@ -180,6 +219,16 @@ describe('Processed Export Listener', async () => {
 				sandbox.assert.calledOnce(Mail.prototype.setData);
 				sandbox.assert.calledOnce(Mail.prototype.setTemplateCode);
 				sandbox.assert.calledOnce(Mail.prototype.send);
+
+				sandbox.assert.calledTwice(ModelExport.prototype.update);
+				sandbox.assert.calledWithExactly(ModelExport.prototype.update.getCall(0),
+					{ status: ModelExport.statuses.sending },
+					{ id: validEvent.id, status: ModelExport.statuses.processed }
+				);
+				sandbox.assert.calledWithExactly(ModelExport.prototype.update.getCall(1),
+					{ status: ModelExport.statuses.sendingError },
+					{ id: validEvent.id, status: ModelExport.statuses.sending }
+				);
 			},
 			event: { ...validEvent },
 			responseCode: 500
