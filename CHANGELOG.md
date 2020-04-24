@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.2.0] - 2020-04-24
+### Added
+- Optional formatFilters method for controllers
+
 ## [1.1.2] - 2020-04-23
 ### Fixed
 - Added serverless functions with serviceName as parameter
