@@ -32,7 +32,7 @@ describe('Created Export Listener', async () => {
 	const exportDocument = {
 		id: validEvent.id,
 		entity: 'cat',
-		filters: { legs: 4 },
+		filters: { legs: 4, isOld: 1 },
 		sortBy: 'bornYear',
 		sortDirection: 'desc',
 		userCreated: 'terrier-1',
@@ -44,7 +44,8 @@ describe('Created Export Listener', async () => {
 			id: index,
 			legs: 4,
 			bornYear: 2019,
-			eyes: 2
+			eyes: 2,
+			isOld: true
 		}));
 
 	const fakeModelPath = path.join(process.cwd(), process.env.MS_PATH || '', 'models', 'cat');
@@ -62,6 +63,19 @@ describe('Created Export Listener', async () => {
 
 			get fileLimit() {
 				return 2;
+			}
+
+			formatFilters(filters) {
+				const forceBoolean = value => !(value === 'false' || value === '0' || !value);
+
+				if(filters.isOld) {
+					return {
+						...filters,
+						isOld: forceBoolean(filters.isOld)
+					};
+				}
+
+				return filters;
 			}
 		}
 
@@ -169,7 +183,7 @@ describe('Created Export Listener', async () => {
 					});
 
 					sandbox.assert.calledOnceWithExactly(FakeModel.prototype.get, {
-						filters: { legs: 4 },
+						filters: { legs: 4, isOld: true },
 						order: {
 							bornYear: 'desc'
 						},
@@ -400,7 +414,7 @@ describe('Created Export Listener', async () => {
 					sandbox.assert.callCount(FakeController.prototype.formatByPage, 5);
 					sandbox.assert.calledThrice(FakeController.prototype.formatByFile);
 					assert(excludeFieldsSpy.get.called);
-					assert(getExcelHeadersSpy.returned(['legs', 'bornYear', 'eyes']));
+					assert(getExcelHeadersSpy.returned(['legs', 'bornYear', 'eyes', 'isOld']));
 					sandbox.assert.calledThrice(ExcelJS.Workbook.prototype.xlsx.writeBuffer);
 					sandbox.assert.calledThrice(S3.putObject);
 					sandbox.assert.calledOnce(ModelExport.prototype.save);

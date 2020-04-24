@@ -111,6 +111,11 @@ There are a few options to customize the exports.
   Returns `{ [Object] }`. Default `items`.
   Format Items before making the file.
 
+* `formatFilters(filters)`.
+
+  Returns `{ Object }`. Default `filters`.
+  Customize filters to get records from database
+
 #### File Fields / Headers
 By Default, Every field in the items getted will be include in the files as headers of each column.
 
