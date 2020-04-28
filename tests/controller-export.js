@@ -25,5 +25,39 @@ describe('Controller', () => {
 				assert.deepStrictEqual(ControllerExport.prototype.excludeFields, []);
 			});
 		});
+
+		describe('Formatters', () => {
+
+			it('Should return the correct value formatting date', () => {
+				const date = new Date();
+
+				assert.strictEqual(ControllerExport.formatDate(date.toISOString()), date.toLocaleString());
+				assert.strictEqual(ControllerExport.formatDate(date.getTime()), date.toLocaleString());
+			});
+
+			it('Should return null if pass falsy value formatting date', () => {
+				[undefined, null, false, 0, ''].forEach(value => {
+					assert.deepStrictEqual(ControllerExport.formatDate(value), null);
+				});
+			});
+
+			it('Should return the correct value formatting user', () => {
+				const caseOne = [{ firstname: 'John', lastname: 'Doe', email: 'john@mail.com' }, 'John Doe (john@mail.com)'];
+				const caseTwo = [{ firstname: 'John', email: 'john@mail.com' }, 'John - (john@mail.com)'];
+				const caseThree = [{ lastname: 'Doe', email: 'john@mail.com' }, '- Doe (john@mail.com)'];
+				const caseFour = [{ firstname: 'John', lastname: 'Doe' }, 'John Doe (-)'];
+				const caseFive = [{ email: 'john@mail.com' }, '- - (john@mail.com)'];
+
+				[caseOne, caseTwo, caseThree, caseFour, caseFive, [{}, '- - (-)']].forEach(([value, expected]) => {
+					assert.deepStrictEqual(ControllerExport.formatUser(value), expected);
+				});
+			});
+
+			it('Should return null if pass falsy value formatting user', () => {
+				[undefined, null, false, 0, ''].forEach(value => {
+					assert.deepStrictEqual(ControllerExport.formatUser(value), null);
+				});
+			});
+		});
 	});
 });
