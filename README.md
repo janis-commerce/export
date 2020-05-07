@@ -320,11 +320,11 @@ class MyEntityHelper extends ExportHelper {
     // important!! define this.items
     this.items = items;
 
-    const entityIds = this.getIds(items);
+    const entityIds = this.getIds('entityName');
 
     const msCall = new MicroServiceCall(session);
 
-    let entyData = await microServiceCall.list('service', 'entity', { filters: { id: entityIds } });
+    let entyData = await microServiceCall.safeList('service', 'entity', { filters: { id: entityIds } });
 
     return this.mapIdToEntity(entyData)
   }
