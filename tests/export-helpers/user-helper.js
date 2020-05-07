@@ -36,7 +36,7 @@ describe('UserHelper', () => {
 
 			const getIdsSpy = sinon.spy(UserHelper, 'getIds');
 
-			sinon.stub(MsCall.prototype, 'list').resolves(Object.values(expectedData));
+			sinon.stub(MsCall.prototype, 'safeList').resolves(Object.values(expectedData));
 
 			const data = await UserHelper.getUsers(itemsExample, {});
 
