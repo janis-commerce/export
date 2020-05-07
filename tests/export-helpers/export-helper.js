@@ -1,7 +1,7 @@
 'use strict';
 
 const sinon = require('sinon');
-const { ExportHelper } = require('../lib/index');
+const { ExportHelper } = require('../../lib/index');
 
 describe('ExportHelper', () => {
 
@@ -38,7 +38,11 @@ describe('ExportHelper', () => {
 
 		it('Should return a specific array', () => {
 			const data = EntityHelper.getEntityFieldIds(itemsExample);
-			sinon.assert.match(data, ['5e7ce95a1eaaf60007215f5b', '5e7ce95a1eaaf60007215f5d', '5e7ce95a1eaaf60007215fg']);
+			sinon.assert.match(data, [
+				'5e7ce95a1eaaf60007215f5b',
+				'5e7ce95a1eaaf60007215f5d',
+				'5e7ce95a1eaaf60007215fg'
+			]);
 		});
 
 		it('Should return a empty array', () => {

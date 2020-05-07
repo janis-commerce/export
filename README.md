@@ -296,3 +296,72 @@ For Start Exporting data `ApiExport` received in the body:
   sortDirection: 'desc'
 }
 ```
+
+
+### Export Helpers
+
+#### ExportHelper
+
+Methods:
+
+* static *getIds* - return a list of ids from an entity.
+
+* static *mapIdToEntity* - Returns an object with attribute the id of the entity and the value the entity itself.
+
+Usage
+
+```js
+const { ExportHelper } = require('@janiscommerce/export');
+
+class MyEntityHelper extends ExportHelper {
+
+  getEntity(items, session) {
+
+    // important!! define this.items
+    this.items = items;
+
+    const entityIds = this.getIds(items);
+
+    const msCall = new MicroServiceCall(session);
+
+    let entyData = await microServiceCall.list('service', 'entity', { filters: { id: entityIds } });
+
+    return this.mapIdToEntity(entyData)
+  }
+
+}
+```
+
+```js
+const { ControllerExport } = require('@janiscommerce/export');
+const { MyEntityHelper } = require('../mi-entity-helper');
+
+class SomeConstroller extends ControllerExport {
+
+  async someMethod(items, session) {
+      this.entityData = await MyEntityHelper.getEntity(items, session)
+  }
+
+}
+
+```
+
+#### UserHelper
+
+Methods:
+
+* static *getUsers* - return a object with entity data for userCerated and userModified
+
+```js
+const { UserHelper, ControllerExport } = require('@janiscommerce/export');
+
+class SomeConstroller extends ControllerExport {
+
+  async someMethod(items, session) {
+    this.userData = await UserHelper.getUsers(items, session)
+  }
+
+}
+
+```
+

@@ -40,7 +40,7 @@
     "@janiscommerce/event-emitter": "^2.0.2",
     "@janiscommerce/event-listener": "^1.1.1",
     "@janiscommerce/mail": "^2.0.0",
-    "@janiscommerce/microservice-call": "^3.0.1",
+    "@janiscommerce/microservice-call": "^4.0.0",
     "@janiscommerce/model": "^3.6.3",
     "@janiscommerce/s3": "^1.2.1",
     "exceljs": "^3.6.1",

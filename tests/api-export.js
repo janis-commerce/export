@@ -147,16 +147,16 @@ describe('API Export', () => {
 				session: true,
 				response: { code: 500 },
 				before: sandbox => {
-					sandbox.stub(MsCall.prototype, 'get').rejects(new Error('MsCall Error (500): Internal Error'));
+					sandbox.stub(MsCall.prototype, 'call').rejects(new Error('MsCall Error (500): Internal Error'));
 					sandbox.stub(ModelExport.prototype);
 					sandbox.stub(EventEmitter, 'emit');
 				},
 				after: (response, sandbox) => {
-					sandbox.assert.calledOnce(MsCall.prototype.get);
+					sandbox.assert.calledOnce(MsCall.prototype.call);
 					sandbox.assert.notCalled(ModelExport.prototype.insert);
 					sandbox.assert.notCalled(EventEmitter.emit);
 
-					sandbox.assert.calledWithExactly(MsCall.prototype.get, 'id', 'user', 'get', null, null, { id: 2 });
+					sandbox.assert.calledWithExactly(MsCall.prototype.call, 'id', 'user', 'get', null, null, { id: 2 });
 				}
 			},
 			{
@@ -167,12 +167,12 @@ describe('API Export', () => {
 				session: true,
 				response: { code: 500 },
 				before: sandbox => {
-					sandbox.stub(MsCall.prototype, 'get').returns({ user: { id: 2 } });
+					sandbox.stub(MsCall.prototype, 'call').returns({ user: { id: 2 } });
 					sandbox.stub(ModelExport.prototype);
 					sandbox.stub(EventEmitter, 'emit');
 				},
 				after: (response, sandbox) => {
-					sandbox.assert.calledOnce(MsCall.prototype.get);
+					sandbox.assert.calledOnce(MsCall.prototype.call);
 					sandbox.assert.notCalled(ModelExport.prototype.insert);
 					sandbox.assert.notCalled(EventEmitter.emit);
 				}
@@ -185,12 +185,12 @@ describe('API Export', () => {
 				session: true,
 				response: { code: 500 },
 				before: sandbox => {
-					sandbox.stub(MsCall.prototype, 'get').returns({ body: { id: 2 } });
+					sandbox.stub(MsCall.prototype, 'call').returns({ body: { id: 2 } });
 					sandbox.stub(ModelExport.prototype);
 					sandbox.stub(EventEmitter, 'emit');
 				},
 				after: (response, sandbox) => {
-					sandbox.assert.calledOnce(MsCall.prototype.get);
+					sandbox.assert.calledOnce(MsCall.prototype.call);
 					sandbox.assert.notCalled(ModelExport.prototype.insert);
 					sandbox.assert.notCalled(EventEmitter.emit);
 				}
@@ -203,12 +203,12 @@ describe('API Export', () => {
 				session: true,
 				response: { code: 200 },
 				before: sandbox => {
-					sandbox.stub(MsCall.prototype, 'get').returns({ body: { id: 2, email: 'user@email.com' } });
+					sandbox.stub(MsCall.prototype, 'call').returns({ body: { id: 2, email: 'user@email.com' } });
 					sandbox.stub(ModelExport.prototype, 'insert').returns('export-1');
 					sandbox.stub(EventEmitter, 'emit');
 				},
 				after: (response, sandbox) => {
-					sandbox.assert.calledOnce(MsCall.prototype.get);
+					sandbox.assert.calledOnce(MsCall.prototype.call);
 					sandbox.assert.calledOnce(ModelExport.prototype.insert);
 					sandbox.assert.calledOnce(EventEmitter.emit);
 
@@ -240,12 +240,12 @@ describe('API Export', () => {
 				session: true,
 				response: { code: 200 },
 				before: sandbox => {
-					sandbox.stub(MsCall.prototype, 'get').returns({ body: { id: 2, email: 'user@email.com' } });
+					sandbox.stub(MsCall.prototype, 'call').returns({ body: { id: 2, email: 'user@email.com' } });
 					sandbox.stub(ModelExport.prototype, 'insert').returns('export-1');
 					sandbox.stub(EventEmitter, 'emit');
 				},
 				after: (response, sandbox) => {
-					sandbox.assert.calledOnce(MsCall.prototype.get);
+					sandbox.assert.calledOnce(MsCall.prototype.call);
 					sandbox.assert.calledOnce(ModelExport.prototype.insert);
 					sandbox.assert.calledOnce(EventEmitter.emit);
 
@@ -269,12 +269,12 @@ describe('API Export', () => {
 				session: true,
 				response: { code: 200 },
 				before: sandbox => {
-					sandbox.stub(MsCall.prototype, 'get').returns({ body: { id: 2, email: 'user@email.com' } });
+					sandbox.stub(MsCall.prototype, 'call').returns({ body: { id: 2, email: 'user@email.com' } });
 					sandbox.stub(ModelExport.prototype, 'insert').returns('export-1');
 					sandbox.stub(EventEmitter, 'emit');
 				},
 				after: (response, sandbox) => {
-					sandbox.assert.calledOnce(MsCall.prototype.get);
+					sandbox.assert.calledOnce(MsCall.prototype.call);
 					sandbox.assert.calledOnce(ModelExport.prototype.insert);
 					sandbox.assert.calledOnce(EventEmitter.emit);
 
