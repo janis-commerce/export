@@ -38,7 +38,7 @@ describe('UserHelper', () => {
 
 			sinon.stub(MsCall.prototype, 'safeList').resolves({ body: Object.values(expectedData) });
 
-			const data = await UserHelper.getUsers(itemsExample, { getSessionInstance: Class => new Class() });
+			const data = await UserHelper.getUsers(itemsExample, { getSessionInstance: MSCALL => new MSCALL() });
 
 			assert(getIdsSpy.returned(Object.keys(expectedData)));
 
