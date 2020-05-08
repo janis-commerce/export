@@ -36,15 +36,18 @@ describe('UserHelper', () => {
 
 			const getIdsSpy = sinon.spy(UserHelper, 'getIds');
 
-			sinon.stub(MsCall.prototype, 'safeList').resolves(Object.values(expectedData));
+			sinon.stub(MsCall.prototype, 'safeList').resolves({ body: Object.values(expectedData) });
 
-			const data = await UserHelper.getUsers(itemsExample, {});
+			const data = await UserHelper.getUsers(itemsExample, { getSessionInstance: Class => new Class() });
 
 			assert(getIdsSpy.returned(Object.keys(expectedData)));
 
 			sinon.assert.match(data, expectedData);
 
 		});
+
+
+		// ACA agregar casos de error de msCall
 
 	});
 

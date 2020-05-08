@@ -315,7 +315,7 @@ const { ExportHelper } = require('@janiscommerce/export');
 
 class MyEntityHelper extends ExportHelper {
 
-  getEntity(items, session) {
+  get(items, session) {
 
     // important!! define this.items
     this.items = items;
@@ -324,9 +324,12 @@ class MyEntityHelper extends ExportHelper {
 
     const msCall = new MicroServiceCall(session);
 
-    let entyData = await microServiceCall.safeList('service', 'entity', { filters: { id: entityIds } });
+    const { body, statusCode } = await microServiceCall.safeList('service', 'entity', { filters: { id: entityIds } });
 
-    return this.mapIdToEntity(entyData)
+    if(statusCode >= 400)
+		  return {};
+
+    return this.mapIdToEntity(body)
   }
 
 }
@@ -336,10 +339,10 @@ class MyEntityHelper extends ExportHelper {
 const { ControllerExport } = require('@janiscommerce/export');
 const { MyEntityHelper } = require('../mi-entity-helper');
 
-class SomeConstroller extends ControllerExport {
+class SomeController extends ControllerExport {
 
   async someMethod(items, session) {
-      this.entityData = await MyEntityHelper.getEntity(items, session)
+    this.entityData = await MyEntityHelper.get(items, session)
   }
 
 }
@@ -355,7 +358,7 @@ Methods:
 ```js
 const { UserHelper, ControllerExport } = require('@janiscommerce/export');
 
-class SomeConstroller extends ControllerExport {
+class SomeController extends ControllerExport {
 
   async someMethod(items, session) {
     this.userData = await UserHelper.getUsers(items, session)

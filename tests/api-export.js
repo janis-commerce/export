@@ -156,7 +156,7 @@ describe('API Export', () => {
 					sandbox.assert.notCalled(ModelExport.prototype.insert);
 					sandbox.assert.notCalled(EventEmitter.emit);
 
-					sandbox.assert.calledWithExactly(MsCall.prototype.call, 'id', 'user', 'get', null, null, { id: 2 });
+					sandbox.assert.calledOnceWithExactly(MsCall.prototype.call, 'id', 'user', 'get', null, null, { id: 2 });
 				}
 			},
 			{
