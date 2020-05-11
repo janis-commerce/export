@@ -50,4 +50,43 @@ describe('ExportFormatters', () => {
 
 	});
 
+
+	describe('formatListBy', () => {
+
+		it('Should return the correct value formatting entity ids', () => {
+			const cases = [[
+				['5e7ce95a1eaaf60007215fa', '5e7ce95a1eaaf60007215fb'],
+				[
+					{ id: '5e7ce95a1eaaf60007215fa', name: 'someNameOne' },
+					{ id: '5e7ce95a1eaaf60007215fb', name: 'someNameTwo' }
+				],
+				'name',
+				'someNameOne, someNameTwo'
+			],
+			[
+				['5e7ce95a1eaaf60007215fa', '5e7ce95a1eaaf60007215fb'],
+				[
+					{ id: '5e7ce95a1eaaf60007215fa', name: 'someNameOne' },
+					{ id: '5e7ce95a1eaaf60007215fc', name: 'someNameTwo' }
+				],
+				'name',
+				'someNameOne'
+			],
+			[
+				['5e7ce95a1eaaf60007215fa', '5e7ce95a1eaaf60007215fb'],
+				[
+					{ id: '5e7ce95a1eaaf60007215fc', name: 'someNameOne' },
+					{ id: '5e7ce95a1eaaf60007215fd', name: 'someNameTwo' }
+				],
+				'name',
+				''
+			]];
+
+			cases.forEach(([list, entities, field, expected]) => {
+				assert.deepStrictEqual(ExportFormatters.formatListBy(list, entities, field), expected);
+			});
+		});
+
+	});
+
 });

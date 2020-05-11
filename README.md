@@ -324,7 +324,7 @@ class MyEntityHelper extends ExportHelper {
 
     const msCall = new MicroServiceCall(session);
 
-    const { body, statusCode } = await microServiceCall.safeList('service', 'entity', { filters: { id: entityIds } });
+    const { body, statusCode } = await microServiceCall.safeList('service', 'entity', { filters: { id: entityIds } );
 
     if(statusCode >= 400)
 		  return {};
@@ -353,7 +353,7 @@ class SomeController extends ControllerExport {
 
 Methods:
 
-* static *getUsers* - return a object with entity data for userCerated and userModified
+* static *getUsers* - return a object with entity data for userCerated and userModified. if fail request, return a empty object.
 
 ```js
 const { UserHelper, ControllerExport } = require('@janiscommerce/export');
@@ -361,7 +361,7 @@ const { UserHelper, ControllerExport } = require('@janiscommerce/export');
 class SomeController extends ControllerExport {
 
   async someMethod(items, session) {
-    this.userData = await UserHelper.getUsers(items, session)
+    this.userData = await UserHelper.getUsers(items, session);
   }
 
 }
