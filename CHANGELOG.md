@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.3.0] - 2020-05-15
+### Added
+- `UserHelper` for getting and format users
+- `ExportHelper` for common uses
+- `ExportFormatters` with useful formatters
+
+### Changed
+- Model Export does not creates logs
+
 ## [1.2.0] - 2020-04-24
 ### Added
 - Optional formatFilters method for controllers
