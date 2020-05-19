@@ -1,6 +1,6 @@
 {
   "name": "@janiscommerce/export",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "A package to handle Janis Exports",
   "main": "lib/index.js",
   "scripts": {
@@ -27,7 +27,7 @@
     "mocha": "^5.2.0",
     "mock-require": "^3.0.3",
     "nyc": "^13.1.0",
-    "sinon": "^7.3.2"
+    "sinon": "^7.5.0"
   },
   "files": [
     "lib/"
