@@ -23,6 +23,10 @@ describe('Models', () => {
 					sendingError: 'sending-error'
 				});
 			});
+
+			it('Should return false', () => {
+				assert.strictEqual(ModelExport.shouldCreateLogs, false);
+			});
 		});
 	});
 });
