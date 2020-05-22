@@ -1,8 +1,8 @@
 'use strict';
 
 const ApiTest = require('@janiscommerce/api-test');
-const EventEmitter = require('@janiscommerce/event-emitter');
 const MsCall = require('@janiscommerce/microservice-call');
+const { Invoker } = require('@janiscommerce/lambda');
 
 const mockRequire = require('mock-require');
 const path = require('path');
@@ -149,12 +149,12 @@ describe('API Export', () => {
 				before: sandbox => {
 					sandbox.stub(MsCall.prototype, 'call').rejects(new Error('MsCall Error (500): Internal Error'));
 					sandbox.stub(ModelExport.prototype);
-					sandbox.stub(EventEmitter, 'emit');
+					sandbox.stub(Invoker, 'clientCall');
 				},
 				after: (response, sandbox) => {
 					sandbox.assert.calledOnce(MsCall.prototype.call);
 					sandbox.assert.notCalled(ModelExport.prototype.insert);
-					sandbox.assert.notCalled(EventEmitter.emit);
+					sandbox.assert.notCalled(Invoker.clientCall);
 
 					sandbox.assert.calledOnceWithExactly(MsCall.prototype.call, 'id', 'user', 'get', null, null, { id: 2 });
 				}
@@ -169,12 +169,12 @@ describe('API Export', () => {
 				before: sandbox => {
 					sandbox.stub(MsCall.prototype, 'call').returns({ user: { id: 2 } });
 					sandbox.stub(ModelExport.prototype);
-					sandbox.stub(EventEmitter, 'emit');
+					sandbox.stub(Invoker, 'clientCall');
 				},
 				after: (response, sandbox) => {
 					sandbox.assert.calledOnce(MsCall.prototype.call);
 					sandbox.assert.notCalled(ModelExport.prototype.insert);
-					sandbox.assert.notCalled(EventEmitter.emit);
+					sandbox.assert.notCalled(Invoker.clientCall);
 				}
 			},
 			{
@@ -187,12 +187,12 @@ describe('API Export', () => {
 				before: sandbox => {
 					sandbox.stub(MsCall.prototype, 'call').returns({ body: { id: 2 } });
 					sandbox.stub(ModelExport.prototype);
-					sandbox.stub(EventEmitter, 'emit');
+					sandbox.stub(Invoker, 'clientCall');
 				},
 				after: (response, sandbox) => {
 					sandbox.assert.calledOnce(MsCall.prototype.call);
 					sandbox.assert.notCalled(ModelExport.prototype.insert);
-					sandbox.assert.notCalled(EventEmitter.emit);
+					sandbox.assert.notCalled(Invoker.clientCall);
 				}
 			},
 			{
@@ -205,14 +205,14 @@ describe('API Export', () => {
 				before: sandbox => {
 					sandbox.stub(MsCall.prototype, 'call').returns({ body: { id: 2, email: 'user@email.com' } });
 					sandbox.stub(ModelExport.prototype, 'insert').returns('export-1');
-					sandbox.stub(EventEmitter, 'emit');
+					sandbox.stub(Invoker, 'clientCall');
 				},
 				after: (response, sandbox) => {
 					sandbox.assert.calledOnce(MsCall.prototype.call);
 					sandbox.assert.calledOnce(ModelExport.prototype.insert);
-					sandbox.assert.calledOnce(EventEmitter.emit);
+					sandbox.assert.calledOnce(Invoker.clientCall);
 
-					sandbox.assert.calledWithExactly(ModelExport.prototype.insert, {
+					const formattedExportData = {
 						entity: 'some-entity',
 						filters: { name: 'some', status: 'active' },
 						sortBy: 'name',
@@ -220,14 +220,10 @@ describe('API Export', () => {
 						userCreated: 2,
 						userEmail: 'user@email.com',
 						status: ModelExport.statuses.pending
-					});
+					};
+					sandbox.assert.calledWithExactly(ModelExport.prototype.insert, formattedExportData);
 
-					sandbox.assert.calledWithExactly(EventEmitter.emit, {
-						entity: 'export',
-						event: 'created',
-						id: 'export-1',
-						client: 'defaultClient'
-					});
+					sandbox.assert.calledWithExactly(Invoker.clientCall, 'ExportProcess', 'defaultClient', formattedExportData);
 				}
 			},
 			{
@@ -242,12 +238,12 @@ describe('API Export', () => {
 				before: sandbox => {
 					sandbox.stub(MsCall.prototype, 'call').returns({ body: { id: 2, email: 'user@email.com' } });
 					sandbox.stub(ModelExport.prototype, 'insert').returns('export-1');
-					sandbox.stub(EventEmitter, 'emit');
+					sandbox.stub(Invoker, 'clientCall');
 				},
 				after: (response, sandbox) => {
 					sandbox.assert.calledOnce(MsCall.prototype.call);
 					sandbox.assert.calledOnce(ModelExport.prototype.insert);
-					sandbox.assert.calledOnce(EventEmitter.emit);
+					sandbox.assert.calledOnce(Invoker.clientCall);
 
 					sandbox.assert.calledWithExactly(ModelExport.prototype.insert, {
 						entity: 'some-entity',
@@ -271,12 +267,12 @@ describe('API Export', () => {
 				before: sandbox => {
 					sandbox.stub(MsCall.prototype, 'call').returns({ body: { id: 2, email: 'user@email.com' } });
 					sandbox.stub(ModelExport.prototype, 'insert').returns('export-1');
-					sandbox.stub(EventEmitter, 'emit');
+					sandbox.stub(Invoker, 'clientCall');
 				},
 				after: (response, sandbox) => {
 					sandbox.assert.calledOnce(MsCall.prototype.call);
 					sandbox.assert.calledOnce(ModelExport.prototype.insert);
-					sandbox.assert.calledOnce(EventEmitter.emit);
+					sandbox.assert.calledOnce(Invoker.clientCall);
 
 					sandbox.assert.calledWithExactly(ModelExport.prototype.insert, {
 						entity: 'some-entity',
