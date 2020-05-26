@@ -15,10 +15,8 @@ describe('Models', () => {
 
 			it('Should return the correct statuses', () => {
 				assert.deepStrictEqual(ModelExport.statuses, {
-					pending: 'pending',
-					processing: 'processing',
+					created: 'created',
 					processed: 'processed',
-					sending: 'sending',
 					sent: 'sent',
 					sendingError: 'sending-error'
 				});

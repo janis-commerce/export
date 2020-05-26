@@ -3,7 +3,6 @@
 const ApiTest = require('@janiscommerce/api-test');
 const MsCall = require('@janiscommerce/microservice-call');
 const { Invoker } = require('@janiscommerce/lambda');
-
 const mockRequire = require('mock-require');
 const path = require('path');
 
@@ -11,12 +10,20 @@ const { ApiExport, ModelExport, ControllerExport } = require('../lib');
 
 describe('API Export', () => {
 
-	const exportData = {
+	const exportDocument = {
 		entity: 'some-entity',
 		filters: { name: 'some', status: 'active' },
 		sortBy: 'name',
 		sortDirection: 'desc'
 	};
+
+	const exportData = {
+		userId: 2,
+		userEmail: 'user@email.com',
+		status: ModelExport.statuses.created
+	};
+
+	const exportId = '5e0a0619bcc3ce0007a18011';
 
 	const exportModelPath = path.join(process.cwd(), process.env.MS_PATH || '', 'models', 'export');
 	const fakeModelPath = path.join(process.cwd(), process.env.MS_PATH || '', 'models', 'some-entity');
@@ -45,7 +52,7 @@ describe('API Export', () => {
 
 		const makeWrongInput = field => {
 
-			const data = { ...exportData };
+			const data = { ...exportDocument };
 			data[field] = { invalid: field };
 			return data;
 		};
@@ -73,7 +80,7 @@ describe('API Export', () => {
 		});
 	});
 
-	context('When no Entity Model exist', () => {
+	context('When no Entity Model exists', () => {
 
 		before(() => {
 			mockRequire(exportModelPath, ModelExport);
@@ -87,7 +94,7 @@ describe('API Export', () => {
 			{
 				description: 'Should return 400',
 				request: {
-					data: exportData
+					data: exportDocument
 				},
 				session: true,
 				response: {
@@ -97,7 +104,7 @@ describe('API Export', () => {
 		]);
 	});
 
-	context('When no Entity Controller exist', () => {
+	context('When no Entity Controller exists', () => {
 
 		before(() => {
 			mockRequire(exportModelPath, ModelExport);
@@ -114,7 +121,7 @@ describe('API Export', () => {
 			{
 				description: 'Should return 400',
 				request: {
-					data: exportData
+					data: exportDocument
 				},
 				session: true,
 				response: {
@@ -142,7 +149,7 @@ describe('API Export', () => {
 			{
 				description: 'Should return 500 if Microservice Call Fails',
 				request: {
-					data: exportData
+					data: exportDocument
 				},
 				session: true,
 				response: { code: 500 },
@@ -162,7 +169,7 @@ describe('API Export', () => {
 			{
 				description: 'Should return 500 if Microservice Call Response Incorrectly',
 				request: {
-					data: exportData
+					data: exportDocument
 				},
 				session: true,
 				response: { code: 500 },
@@ -180,7 +187,7 @@ describe('API Export', () => {
 			{
 				description: 'Should return 500 if User found has no email',
 				request: {
-					data: exportData
+					data: exportDocument
 				},
 				session: true,
 				response: { code: 500 },
@@ -198,32 +205,20 @@ describe('API Export', () => {
 			{
 				description: 'Should return 200 if Export Document is saved correctly',
 				request: {
-					data: exportData
+					data: exportDocument
 				},
 				session: true,
 				response: { code: 200 },
 				before: sandbox => {
 					sandbox.stub(MsCall.prototype, 'call').returns({ body: { id: 2, email: 'user@email.com' } });
-					sandbox.stub(ModelExport.prototype, 'insert').returns('export-1');
+					sandbox.stub(ModelExport.prototype, 'insert').returns(exportId);
 					sandbox.stub(Invoker, 'clientCall');
 				},
 				after: (response, sandbox) => {
+
 					sandbox.assert.calledOnce(MsCall.prototype.call);
-					sandbox.assert.calledOnce(ModelExport.prototype.insert);
-					sandbox.assert.calledOnce(Invoker.clientCall);
-
-					const formattedExportData = {
-						entity: 'some-entity',
-						filters: { name: 'some', status: 'active' },
-						sortBy: 'name',
-						sortDirection: 'desc',
-						userCreated: 2,
-						userEmail: 'user@email.com',
-						status: ModelExport.statuses.pending
-					};
-					sandbox.assert.calledWithExactly(ModelExport.prototype.insert, formattedExportData);
-
-					sandbox.assert.calledWithExactly(Invoker.clientCall, 'ExportProcess', 'defaultClient', formattedExportData);
+					sandbox.assert.calledOnceWithExactly(ModelExport.prototype.insert, { exportDocument, exportData });
+					sandbox.assert.calledOnceWithExactly(Invoker.clientCall, 'ExportProcess', 'defaultClient', { id: exportId, exportDocument, exportData });
 				}
 			},
 			{
@@ -237,19 +232,18 @@ describe('API Export', () => {
 				response: { code: 200 },
 				before: sandbox => {
 					sandbox.stub(MsCall.prototype, 'call').returns({ body: { id: 2, email: 'user@email.com' } });
-					sandbox.stub(ModelExport.prototype, 'insert').returns('export-1');
+					sandbox.stub(ModelExport.prototype, 'insert').returns(exportId);
 					sandbox.stub(Invoker, 'clientCall');
 				},
 				after: (response, sandbox) => {
-					sandbox.assert.calledOnce(MsCall.prototype.call);
-					sandbox.assert.calledOnce(ModelExport.prototype.insert);
-					sandbox.assert.calledOnce(Invoker.clientCall);
 
-					sandbox.assert.calledWithExactly(ModelExport.prototype.insert, {
-						entity: 'some-entity',
-						userCreated: 2,
-						userEmail: 'user@email.com',
-						status: ModelExport.statuses.pending
+					sandbox.assert.calledOnce(MsCall.prototype.call);
+					sandbox.assert.calledOnce(Invoker.clientCall);
+					sandbox.assert.calledOnceWithExactly(ModelExport.prototype.insert, {
+						exportDocument: {
+							entity: 'some-entity'
+						},
+						exportData
 					});
 				}
 			},
@@ -266,23 +260,16 @@ describe('API Export', () => {
 				response: { code: 200 },
 				before: sandbox => {
 					sandbox.stub(MsCall.prototype, 'call').returns({ body: { id: 2, email: 'user@email.com' } });
-					sandbox.stub(ModelExport.prototype, 'insert').returns('export-1');
+					sandbox.stub(ModelExport.prototype, 'insert').returns(exportId);
 					sandbox.stub(Invoker, 'clientCall');
 				},
 				after: (response, sandbox) => {
-					sandbox.assert.calledOnce(MsCall.prototype.call);
-					sandbox.assert.calledOnce(ModelExport.prototype.insert);
-					sandbox.assert.calledOnce(Invoker.clientCall);
 
-					sandbox.assert.calledWithExactly(ModelExport.prototype.insert, {
-						entity: 'some-entity',
-						filters: { name: 'some', status: 'active' },
-						sortBy: 'name',
-						sortDirection: 'asc',
-						userCreated: 2,
-						userEmail: 'user@email.com',
-						status: ModelExport.statuses.pending
-					});
+					const exportDocumentFormatted = { ...exportDocument, sortDirection: 'asc' };
+					sandbox.assert.calledOnce(MsCall.prototype.call);
+					sandbox.assert.calledOnceWithExactly(Invoker.clientCall, 'ExportProcess', 'defaultClient',
+						{ id: exportId, exportData, exportDocument: exportDocumentFormatted });
+					sandbox.assert.calledOnceWithExactly(ModelExport.prototype.insert, { exportDocument: exportDocumentFormatted, exportData });
 				}
 			}
 		]);
