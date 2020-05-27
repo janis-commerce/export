@@ -321,7 +321,7 @@ describe('Export Process Test', async () => {
 	});
 
 
-	const beforeStub  = (FakeController) => {
+	const beforeStub = FakeController => {
 		sandbox.spy(ExportProcess.prototype, 'preProcess');
 		sandbox.spy(ExportProcess.prototype, 'postProcess');
 		sandbox.stub(ModelExport.prototype, 'save').returns(true);
@@ -340,9 +340,9 @@ describe('Export Process Test', async () => {
 		sandbox.stub(ExcelJS.Workbook.prototype.xlsx, 'writeBuffer').returns(Buffer.from('some-excel-file'));
 		sandbox.stub(S3, 'putObject');
 
-	}
+	};
 
-	const afterAssert = (FakeController) => {
+	const afterAssert = FakeController => {
 		sandbox.assert.calledOnce(ExportProcess.prototype.preProcess);
 		sandbox.assert.calledOnce(ExportProcess.prototype.postProcess);
 		sandbox.assert.calledOnce(ModelExport.prototype.save);
@@ -357,9 +357,9 @@ describe('Export Process Test', async () => {
 				'exports/defaultClient/5e0a0619bcc3ce0007a18123/cat-5e0a0619bcc3ce0007a18011-part2.xlsx',
 				'exports/defaultClient/5e0a0619bcc3ce0007a18123/cat-5e0a0619bcc3ce0007a18011-part3.xlsx'];
 		sandbox.assert.calledOnceWithExactly(ExportProcess.prototype.sendEmail, { ...exportDocument, files });
-	}
+	};
 
-	context("When Controller has exclude fields", async () => {
+	context('When Controller has exclude fields', async () => {
 
 		class FakeController extends ControllerExport {
 			get pageLimit() {
@@ -392,7 +392,7 @@ describe('Export Process Test', async () => {
 		let excludeFieldsSpy;
 		let getExcelHeadersSpy;
 
-		it("Should generate the files, upload them and mail the files", async () => {
+		it('Should generate the files, upload them and mail the files', async () => {
 
 			beforeStub(FakeController);
 			getExcelHeadersSpy = sandbox.spy(FakeController.prototype, 'getExcelHeaders');
@@ -408,7 +408,7 @@ describe('Export Process Test', async () => {
 
 	});
 
-	context("When Controller has include fields", async () => {
+	context('When Controller has include fields', async () => {
 
 		class FakeController extends ControllerExport {
 			get pageLimit() {
@@ -441,7 +441,7 @@ describe('Export Process Test', async () => {
 		let excludeFieldsSpy;
 		let getExcelHeadersSpy;
 
-		it("Should generate the files, upload them and mail the files", async () => {
+		it('Should generate the files, upload them and mail the files', async () => {
 
 			beforeStub(FakeController);
 			getExcelHeadersSpy = sandbox.spy(FakeController.prototype, 'getExcelHeaders');
