@@ -84,10 +84,12 @@ describe('API Export', () => {
 
 		before(() => {
 			mockRequire(exportModelPath, ModelExport);
+			mockRequire(fakeControllerPath, FakeController);
 		});
 
 		after(() => {
 			mockRequire.stop(exportModelPath);
+			mockRequire.stop(fakeControllerPath);
 		});
 
 		ApiTest(ApiExport, '/api/export', [
@@ -217,8 +219,8 @@ describe('API Export', () => {
 				after: (response, sandbox) => {
 
 					sandbox.assert.calledOnce(MsCall.prototype.call);
-					sandbox.assert.calledOnceWithExactly(ModelExport.prototype.insert, { exportDocument, exportData });
-					sandbox.assert.calledOnceWithExactly(Invoker.clientCall, 'ExportProcess', 'defaultClient', { id: exportId, exportDocument, exportData });
+					sandbox.assert.calledOnceWithExactly(ModelExport.prototype.insert, { ...exportDocument, ...exportData });
+					sandbox.assert.calledOnceWithExactly(Invoker.clientCall, 'ExportProcess', 'defaultClient', { id: exportId, ...exportDocument, ...exportData });
 				}
 			},
 			{
@@ -240,10 +242,8 @@ describe('API Export', () => {
 					sandbox.assert.calledOnce(MsCall.prototype.call);
 					sandbox.assert.calledOnce(Invoker.clientCall);
 					sandbox.assert.calledOnceWithExactly(ModelExport.prototype.insert, {
-						exportDocument: {
-							entity: 'some-entity'
-						},
-						exportData
+						entity: 'some-entity',
+						...exportData
 					});
 				}
 			},
@@ -268,8 +268,8 @@ describe('API Export', () => {
 					const exportDocumentFormatted = { ...exportDocument, sortDirection: 'asc' };
 					sandbox.assert.calledOnce(MsCall.prototype.call);
 					sandbox.assert.calledOnceWithExactly(Invoker.clientCall, 'ExportProcess', 'defaultClient',
-						{ id: exportId, exportData, exportDocument: exportDocumentFormatted });
-					sandbox.assert.calledOnceWithExactly(ModelExport.prototype.insert, { exportDocument: exportDocumentFormatted, exportData });
+						{ id: exportId, ...exportData, ...exportDocumentFormatted });
+					sandbox.assert.calledOnceWithExactly(ModelExport.prototype.insert, { ...exportDocumentFormatted, ...exportData });
 				}
 			}
 		]);
