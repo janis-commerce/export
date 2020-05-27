@@ -321,11 +321,138 @@ describe('Export Process Test', async () => {
 	});
 
 
-	// context("When Controller has exclude fields", async () => {
+	const beforeStub  = (FakeController) => {
+		sandbox.spy(ExportProcess.prototype, 'preProcess');
+		sandbox.spy(ExportProcess.prototype, 'postProcess');
+		sandbox.stub(ModelExport.prototype, 'save').returns(true);
+		sandbox.stub(ExportProcess.prototype, 'sendEmail').returns(true);
+		sandbox.stub(ModelExport.prototype, 'update').returns(true);
+		sandbox.spy(FakeController.prototype, 'formatByPage');
+		sandbox.spy(FakeController.prototype, 'formatByFile');
+		const items = makeItems(5);
+		const getModelStub = sandbox.stub(FakeModel.prototype, 'get');
+		items.forEach((item, i) => {
+			getModelStub.onCall(i).returns([item]);
+		});
+		sandbox.stub(FakeModel.prototype, 'getTotals').returns({
+			pages: 5
+		});
+		sandbox.stub(ExcelJS.Workbook.prototype.xlsx, 'writeBuffer').returns(Buffer.from('some-excel-file'));
+		sandbox.stub(S3, 'putObject');
 
-	// });
+	}
 
-	// context("When Controller has include fields", async () => {
+	const afterAssert = (FakeController) => {
+		sandbox.assert.calledOnce(ExportProcess.prototype.preProcess);
+		sandbox.assert.calledOnce(ExportProcess.prototype.postProcess);
+		sandbox.assert.calledOnce(ModelExport.prototype.save);
+		sandbox.assert.callCount(FakeModel.prototype.get, 5);
+		sandbox.assert.calledOnce(ModelExport.prototype.update);
+		sandbox.assert.callCount(FakeController.prototype.formatByPage, 5);
+		sandbox.assert.calledThrice(FakeController.prototype.formatByFile);
+		sandbox.assert.calledThrice(ExcelJS.Workbook.prototype.xlsx.writeBuffer);
+		sandbox.assert.calledThrice(S3.putObject);
+		const files =
+			['exports/defaultClient/5e0a0619bcc3ce0007a18123/cat-5e0a0619bcc3ce0007a18011-part1.xlsx',
+				'exports/defaultClient/5e0a0619bcc3ce0007a18123/cat-5e0a0619bcc3ce0007a18011-part2.xlsx',
+				'exports/defaultClient/5e0a0619bcc3ce0007a18123/cat-5e0a0619bcc3ce0007a18011-part3.xlsx'];
+		sandbox.assert.calledOnceWithExactly(ExportProcess.prototype.sendEmail, { ...exportDocument, files });
+	}
 
-	// });
+	context("When Controller has exclude fields", async () => {
+
+		class FakeController extends ControllerExport {
+			get pageLimit() {
+				return 1;
+			}
+
+			get fileLimit() {
+				return 2;
+			}
+
+			get excludeFields() {
+				return ['id'];
+			}
+
+			format(items) {
+				return items;
+			}
+		}
+
+		afterEach(() => sandbox.restore());
+
+		before(() => {
+			beforeMockRequire(FakeController);
+		});
+
+		after(() => {
+			afterMockRequire();
+		});
+
+		let excludeFieldsSpy;
+		let getExcelHeadersSpy;
+
+		it("Should generate the files, upload them and mail the files", async () => {
+
+			beforeStub(FakeController);
+			getExcelHeadersSpy = sandbox.spy(FakeController.prototype, 'getExcelHeaders');
+			excludeFieldsSpy = sandbox.spy(FakeController.prototype, 'excludeFields', ['get']);
+
+			await exportProcessHandler(event);
+
+
+			assert(excludeFieldsSpy.get.called);
+			assert(getExcelHeadersSpy.returned(['legs', 'bornYear', 'eyes', 'isOld']));
+			afterAssert(FakeController);
+		});
+
+	});
+
+	context("When Controller has include fields", async () => {
+
+		class FakeController extends ControllerExport {
+			get pageLimit() {
+				return 1;
+			}
+
+			get fileLimit() {
+				return 2;
+			}
+
+			get fields() {
+				return ['bornYear'];
+			}
+
+			get excludeFields() {
+				return ['id'];
+			}
+		}
+
+		afterEach(() => sandbox.restore());
+
+		before(() => {
+			beforeMockRequire(FakeController);
+		});
+
+		after(() => {
+			afterMockRequire();
+		});
+
+		let excludeFieldsSpy;
+		let getExcelHeadersSpy;
+
+		it("Should generate the files, upload them and mail the files", async () => {
+
+			beforeStub(FakeController);
+			getExcelHeadersSpy = sandbox.spy(FakeController.prototype, 'getExcelHeaders');
+			excludeFieldsSpy = sandbox.spy(FakeController.prototype, 'excludeFields', ['get']);
+
+			await exportProcessHandler(event);
+
+			assert(excludeFieldsSpy.get.notCalled);
+			assert(getExcelHeadersSpy.returned(['bornYear']));
+			afterAssert(FakeController);
+		});
+
+	});
 });
