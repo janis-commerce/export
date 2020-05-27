@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const { ExportFormatters } = require('../lib/index');
+const { ExportFormatters } = require('../../lib/index');
 
 const falsyCases = [undefined, null, false, 0, ''];
 

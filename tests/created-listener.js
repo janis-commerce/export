@@ -1,21 +1,21 @@
 // 'use strict';
 
-// const EventEmitter = require('@janiscommerce/event-emitter');
-// const Model = require('@janiscommerce/model');
-// const S3 = require('@janiscommerce/s3');
-// const ExcelJS = require('exceljs');
-// const assert = require('assert');
+// // const EventEmitter = require('@janiscommerce/event-emitter');
+// // const Model = require('@janiscommerce/model');
+// // const S3 = require('@janiscommerce/s3');
+// // const ExcelJS = require('exceljs');
+// // const assert = require('assert');
 
-// const logger = require('lllog');
-// const mockRequire = require('mock-require');
-// const path = require('path');
+// // const logger = require('lllog');
+// // const mockRequire = require('mock-require');
+// // const path = require('path');
 
-// logger('none');
+// // logger('none');
 
-// const { ServerlessHandler } = require('@janiscommerce/event-listener');
-// const EventListenerTest = require('@janiscommerce/event-listener-test');
+// // const { ServerlessHandler } = require('@janiscommerce/event-listener');
+// // const EventListenerTest = require('@janiscommerce/event-listener-test');
 
-// const { CreatedListener, ModelExport, ControllerExport } = require('../lib/index');
+// // const { CreatedListener, ModelExport, ControllerExport } = require('../lib/index');
 
 // const handler = (...args) => ServerlessHandler.handle(CreatedListener, ...args);
 
