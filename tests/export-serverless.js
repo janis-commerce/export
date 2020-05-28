@@ -59,7 +59,7 @@ describe('export-serveless', () => {
 				getHooks(handlerPathWithSrc, modelsPathWithSrc, controllersPathWithSrc, clientModelPathWithSrc));
 		});
 
-		it('Should return the correct hooks without MS_Path', () => {
+		it('Should return the correct hooks without MS_PATH', () => {
 			delete (process.env.MS_PATH);
 			assert.deepStrictEqual(exportServerless('wms'),
 				getHooks(handlerPathWithoutSrc, modelsPathWithoutSrc, controllersPathWithoutSrc, clientModelPathWithoutSrc));

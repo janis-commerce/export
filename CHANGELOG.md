@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Export-Serverless getter - add serverless hooks and  iamStatements.
+- Export-process - lambda function instead of events.
+
+### Changed
+- API-export - now uses lambda instead of events.
+
+### Removed
+- Created Listener - now uses export process
+- Processed Listener - now uses export process
+- Docs events
 
 ## [1.4.1] - 2020-05-19
 ### Changed

@@ -14,17 +14,20 @@ When It's funcional the API will get documents from Entities in your Microservic
 npm install @janiscommerce/export
 ```
 
+
+
 ## Configuration
 
 In orden to be functional the Export API needs:
 
 * Model of Export and the Entities which wants to export
 * Create Controllers for those entities
-* Create a generic API Export
-* Create a generic Created Export Listener
-* Create a generic Processed Export Listener
-* Configure Schemas and Serverless functions
-* Configure Events
+* Create a generic API Export (:warning: since version 4.x.x major changes - now it uses lambda functions)
+* Export process lambda function.
+* Create a generic Created Export Listener (:warning: deprecated since version 2.x.x)
+* Create a generic Processed Export Listener (:warning: deprecated since version 2.x.x)
+* Configure Schemas, and Serverless functions
+* Configure Events (:warning: deprecated since version 2.x.x)
 
 ### ENV vars
 
@@ -178,7 +181,7 @@ module.exports = CatController;
 
 ### API
 
-Only need to require `ApiExport` and export it. It needs to use `LoggedAuthorizer`.
+Only need to require `ApiExport` and export it.
 
 ```js
 'use strict';
@@ -188,7 +191,222 @@ const { ApiExport } = require('@janiscommerce/export');
 module.exports = ApiExport;
 ```
 
-### Created Listener
+### Export process
+
+Only need to require `ExportProcess` and extend your class, for basic use.
+
+#### Customize
+
+There are a few options to customize the exports.
+
+* *async* `preProcess(exportDocument)`.
+
+  Params: `exportDocument`, the export options.
+  Method to do something before the export process starts, like Emit an event or saved in Database or Cache, some other validation.
+
+* *async* `postProcess(exportDocumentSaved)`.
+
+  Params: `exportDocumentSaved`, the export options.
+  Method to do something after the export process was created and files are uploaded, like Emit an event or saved in Database or Cache, some other validation.
+
+Export Document have the options which will be used to get the data:
+* `entity`, Entity name
+* `filters`, filters to be used
+* `sortBy`, fields to be sorted by
+* `sortDirection`, sort direction (`asc` or `desc`)
+* `userCreated` ID of User who request the export
+* `userEmail` User Email which will be used to send the data
+* `dateCreated`
+
+#### Example
+
+```js
+'use strict';
+
+const { Handler } = require('@janiscommerce/lambda');
+const { ExportProcess } = require('@janiscommerce/export');
+const EventEmitter = require('@janiscommerce/event-emitter');
+
+class ExportProcess extends CreatedListener {
+
+  async preProcess({id, entity}) {
+		return EventEmitter.emit({
+      entity,
+      event: 'export-started'.
+      id
+    });
+  }
+
+  async postProcess({id, entity}) {
+		return EventEmitter.emit({
+      entity,
+      event: 'export-finished'.
+      id
+    });
+	}
+}
+
+module.exports.handler = (...args) => Handler.handle(ExportProcess, ...args);
+```
+
+### Export serverless
+
+In `path/to/root/serverless.js` add:
+
+```js
+'use strict';
+
+const { helper } = require('sls-helper'); // eslint-disable-line
+const functions = require('./serverless/functions.json');
+const { exportServerless } =  require('@janiscommerce/export');
+
+module.exports = helper({
+	hooks: [
+		// other hooks
+        ...functions,
+        ...exportServerless
+	]
+});
+```
+
+### Schemas
+
+In `path/to/root/schemas/src/public/export` add:
+
+* [`base.yml` file](docs/schemas/export/base.yml)
+* [`post.yml` file](docs/schemas/export/post.yml)
+
+## Usage
+
+For Start Exporting data `ApiExport` received in the body:
+
+* entity: `{string}`, name of the entity
+* filters: `{object}`, object with name of the fields and its values as *key/value*.
+* sortBy: `{string}`, name of the field to sort by.
+* sortDirection: `{'asc' | 'ASC' | 'desc' | 'DESC'}`, direction of the sorting
+
+#### Example
+
+```js
+{
+  entity: 'cats'
+  filters: {
+    region: 'europe'
+    gender: 'female'
+  },
+  sortBy: 'color',
+  sortDirection: 'desc'
+}
+```
+
+
+### Export Tools
+
+Implementing several exports in services may lead to some code repetition. In order to avoid this repetition the package provides some usefull tools. 
+
+
+#### ExportHelper
+
+The `get` method should be redefined. You should get an array of ids from an specified field from the entity (using getIds for example) and then get the entitys from a model or using the Microservice-call package.
+
+Sometimes it is useful to return an object in which the keys ar the ids and the values are the entities getted from model or from the microservice-call.
+
+Methods:
+
+* static *getIds* - return a list of ids from an entity.
+
+* static *mapIdToEntity* - Returns an object with attribute the id of the entity and the value the entity itself.
+
+Usage
+
+```js
+const { ExportHelper } = require('@janiscommerce/export');
+const { MsCall } = require('@janiscommerce/microservice-call);
+
+class AirlineHelper extends ExportHelper {
+
+  get(items, session) {
+
+    // important!! define this.items
+    this.items = items;
+
+    const airlinesIds = this.getIds('airlineId');
+
+    if(! airlinesIds.length)// to avoid unneed requests
+      return {};
+
+    const msCall = session.getSessionInstance(MsCall);
+
+    const { body, statusCode } = await microServiceCall.safeList('InternationalAirlines', 'airline', { filters: { id: airlinesIds } );
+
+    if(statusCode >= 400)
+     return {};
+
+    return this.mapIdToEntity(body)
+  }
+}
+```
+
+#### UserHelper
+
+Is an implementation of the Export Helper in which the microservice call to the service Id and the getIds selecting userCreated and userModified are already implemented.
+
+Methods:
+
+* static *getUsers* - return a object with entity data for userCerated and userModified. if fail request, return a empty object.
+
+:warning: It returns the users formatted in an object which keys are the ids and the values the user itself.
+
+
+#### Formatters
+
+Some data is required to be formatted in a special way repetitively in every entity. The export package provides with a static format to help with the formatting.
+
+* static *formatDate(date)* - returns a string with the date formatted like: 'DD/MM/YY HH-MM'.
+* static *formatUser(user)* - returns a string with the user's full name and email formatted like: ' name - lastName - email'
+* static *formatListBy(listIds, entities, field)* - returns a string with the `field` value from the entity separated by commas. Only if the entity id is included in the listIds.
+
+
+#### Example of a controller using all the tools: 
+
+```js
+const { ControllerExport, UserHelper, ExportFormatters } = require('@janiscommerce/export');
+const { AirlineHelper } = require('../helpers/airline-helper');
+
+class FligthController extends ControllerExport {
+
+  async formatByPage(items){
+
+      await setAirlines(items);
+      await setUsers(items);
+
+      return items.map(flight => ({
+        airline: this.airlines[flight.airlineId].name,
+        aliance: this.airlines[flight.airlineId].aliance,
+        userCreated: ExportFormatters.formatUser(this.users[flight.userCreated]),
+        dateCreated: ExportFormatters.formatDate(flight.dateCreated)
+      }))
+  }
+
+  async setAirlines(items, session) {
+    this.airlines = await AirlineHelper.get(items, session);
+  }
+
+  async setUsers(items, session){
+    this.users = await UserHelper.getUsers(items, session);
+  }
+}
+
+module.exports = FlightController;
+```
+
+
+
+## :warning: :skull: Deprecated
+
+Since version 2.0.0 the package does not use events. Instead uses the[@janiscommerce/lambda](https://www.npmjs.com/package/@janiscommerce/lambda) package.
+
+### Created Listener (:warning: Since version 2.x.x deprecated)
 
 Only need to require `CreatedListener` and extend your class, for basic use.
 
@@ -247,7 +465,7 @@ class ExportCreatedListener extends CreatedListener {
 module.exports.handler = (...args) => ServerlessHandler.handle(ExportCreatedListener, ...args);
 ```
 
-### Processed Listener
+### Processed Listener (:warning: Since version 2.x.x deprecated)
 
 Only need to require `ProcessedListener` and export it.
 
@@ -260,111 +478,9 @@ const { ProcessedListener } = require('@janiscommerce/export');
 module.exports.handler = (...args) => ServerlessHandler.handle(ProcsesedListener, ...args);
 ```
 
-### Events
+### Events (:warning: Since version 2.x.x deprecated)
 
 * In `path/to/root/events/events.yml`, must add [this](docs/events/events.yml)
 
 * In `path/to/root/events/src/{your-service}/export/created.yml`, must add [this file](docs/events/src/export/created.yml)
 * In `path/to/root/events/src/{your-service}/export/processed.yml`, must add [this file](docs/events/src/export/processed.yml)
-
-### Schemas
-
-In `path/to/root/schemas/src/public/export` add:
-
-* [`base.yml` file](docs/schemas/export/base.yml)
-* [`post.yml` file](docs/schemas/export/post.yml)
-
-## Usage
-
-For Start Exporting data `ApiExport` received in the body:
-
-* entity: `{string}`, name of the entity
-* filters: `{object}`, object with name of the fields and its values as *key/value*.
-* sortBy: `{string}`, name of the field to sort by.
-* sortDirection: `{'asc' | 'ASC' | 'desc' | 'DESC'}`, direction of the sorting
-
-#### Example
-
-```js
-{
-  entity: 'cats'
-  filters: {
-    region: 'europe'
-    gender: 'female'
-  },
-  sortBy: 'color',
-  sortDirection: 'desc'
-}
-```
-
-
-### Export Helpers
-
-#### ExportHelper
-
-Methods:
-
-* static *getIds* - return a list of ids from an entity.
-
-* static *mapIdToEntity* - Returns an object with attribute the id of the entity and the value the entity itself.
-
-Usage
-
-```js
-const { ExportHelper } = require('@janiscommerce/export');
-
-class MyEntityHelper extends ExportHelper {
-
-  get(items, session) {
-
-    // important!! define this.items
-    this.items = items;
-
-    const entityIds = this.getIds('entityName');
-
-    const msCall = new MicroServiceCall(session);
-
-    const { body, statusCode } = await microServiceCall.safeList('service', 'entity', { filters: { id: entityIds } );
-
-    if(statusCode >= 400)
-		  return {};
-
-    return this.mapIdToEntity(body)
-  }
-
-}
-```
-
-```js
-const { ControllerExport } = require('@janiscommerce/export');
-const { MyEntityHelper } = require('../mi-entity-helper');
-
-class SomeController extends ControllerExport {
-
-  async someMethod(items, session) {
-    this.entityData = await MyEntityHelper.get(items, session)
-  }
-
-}
-
-```
-
-#### UserHelper
-
-Methods:
-
-* static *getUsers* - return a object with entity data for userCerated and userModified. if fail request, return a empty object.
-
-```js
-const { UserHelper, ControllerExport } = require('@janiscommerce/export');
-
-class SomeController extends ControllerExport {
-
-  async someMethod(items, session) {
-    this.userData = await UserHelper.getUsers(items, session);
-  }
-
-}
-
-```
-
