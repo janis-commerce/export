@@ -12,7 +12,7 @@ const Model = require('@janiscommerce/model');
 
 const S3 = require('@janiscommerce/s3');
 const ExcelJS = require('exceljs');
-const { Mail, MailError } = require('@janiscommerce/mail');
+const { Mail } = require('@janiscommerce/mail');
 const { ModelExport, ControllerExport } = require('../lib');
 
 require('lllog')('none');
@@ -525,40 +525,6 @@ describe('Export Process Test', async () => {
 			sandbox.stub(S3, 'getSignedUrl');
 
 			await exportProcessHandler(event);
-
-			sandbox.assert.calledOnce(ModelExport.prototype.save);
-			commonAsserts(FakeControllerFormatFilters);
-			sandbox.assert.calledThrice(ExcelJS.Workbook.prototype.xlsx.writeBuffer);
-			sandbox.assert.calledThrice(S3.putObject);
-			sandbox.assert.calledOnce(ExportProcess.prototype.postProcess);
-			sandbox.assert.calledOnce(Mail.prototype.setEntity);
-			sandbox.assert.calledOnce(Mail.prototype.setEntityId);
-			sandbox.assert.calledOnce(Mail.prototype.setData);
-			sandbox.assert.calledOnce(Mail.prototype.setTemplateCode);
-
-			sandbox.assert.calledOnceWithExactly(ModelExport.prototype.update,
-				{ status: ModelExport.statuses.sendingError },
-				{ id: exportDocument.id, status: ModelExport.statuses.processed });
-		});
-
-		it('Should throw an error if Mail fails because of Microservice Call', async () => {
-
-			commonStubs(FakeControllerFormatFilters);
-			stubModelWith5Elelements();
-			sandbox.stub(ExcelJS.Workbook.prototype.xlsx, 'writeBuffer').returns(Buffer.from('some-excel-file'));
-			sandbox.stub(S3, 'putObject');
-			sandbox.stub(Mail.prototype, 'setEntity').returnsThis();
-			sandbox.stub(Mail.prototype, 'setEntityId').returnsThis();
-			sandbox.stub(Mail.prototype, 'setData').returnsThis();
-			sandbox.stub(Mail.prototype, 'setTemplateCode').returnsThis();
-
-			const MsCallError = new Error('Mails Failed');
-			MsCallError.code = MailError.codes.MS_CALL_ERROR;
-
-			sandbox.stub(Mail.prototype, 'send').rejects(MsCallError);
-			sandbox.stub(S3, 'getSignedUrl');
-
-			await assert.rejects(exportProcessHandler(event), { message: 'Mails Failed' });
 
 			sandbox.assert.calledOnce(ModelExport.prototype.save);
 			commonAsserts(FakeControllerFormatFilters);
