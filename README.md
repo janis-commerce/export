@@ -28,6 +28,7 @@ In orden to be functional the Export API needs:
 * Create a generic Processed Export Listener (:warning: deprecated since version 2.0.0)
 * Configure Schemas, and Serverless functions
 * Configure Events (:warning: deprecated since version 2.0.0)
+* Configure `.nycrc` to avoid coverage leaks
 
 ### ENV vars
 
@@ -277,6 +278,26 @@ In `path/to/root/schemas/src/public/export` add:
 
 * [`base.yml` file](docs/schemas/export/base.yml)
 * [`post.yml` file](docs/schemas/export/post.yml)
+
+
+### `.nycrc`
+
+Create or update `./.nycrc` to avoid coverage leaks:
+
+```
+{
+  "exclude": [
+    //... your files
+    "src/models/export.js",
+    "src/api/export/post.js",
+    "src/lambda/ExportProcess.js"
+  ]
+}
+```
+
+:warning: If exists any customization of the files, do not add the file to the .nyrcr and add the corresponding tests.
+
+
 
 ## Usage
 
