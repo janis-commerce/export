@@ -22,12 +22,12 @@ In orden to be functional the Export API needs:
 
 * Model of Export and the Entities which wants to export
 * Create Controllers for those entities
-* Create a generic API Export (:warning: since version 4.x.x major changes - now it uses lambda functions)
+* Create a generic API Export (:warning: since version 2.0.0 major changes - now it uses lambda functions)
 * Export process lambda function.
-* Create a generic Created Export Listener (:warning: deprecated since version 2.x.x)
-* Create a generic Processed Export Listener (:warning: deprecated since version 2.x.x)
+* Create a generic Created Export Listener (:warning: deprecated since version 2.0.0)
+* Create a generic Processed Export Listener (:warning: deprecated since version 2.0.0)
 * Configure Schemas, and Serverless functions
-* Configure Events (:warning: deprecated since version 2.x.x)
+* Configure Events (:warning: deprecated since version 2.0.0)
 
 ### ENV vars
 
@@ -218,6 +218,8 @@ Export Document have the options which will be used to get the data:
 * `userEmail` User Email which will be used to send the data
 * `dateCreated`
 
+In `path/to/root/[MS_PATH]/lambda/ExportProcess.js`.
+
 #### Example
 
 ```js
@@ -406,7 +408,7 @@ module.exports = FlightController;
 
 Since version 2.0.0 the package does not use events. Instead uses the[@janiscommerce/lambda](https://www.npmjs.com/package/@janiscommerce/lambda) package.
 
-### Created Listener (:warning: Since version 2.x.x deprecated)
+### Created Listener (:warning: Since version 2.0.0 deprecated)
 
 Only need to require `CreatedListener` and extend your class, for basic use.
 
@@ -465,7 +467,7 @@ class ExportCreatedListener extends CreatedListener {
 module.exports.handler = (...args) => ServerlessHandler.handle(ExportCreatedListener, ...args);
 ```
 
-### Processed Listener (:warning: Since version 2.x.x deprecated)
+### Processed Listener (:warning: Since version 2.0.0 deprecated)
 
 Only need to require `ProcessedListener` and export it.
 
@@ -478,7 +480,7 @@ const { ProcessedListener } = require('@janiscommerce/export');
 module.exports.handler = (...args) => ServerlessHandler.handle(ProcsesedListener, ...args);
 ```
 
-### Events (:warning: Since version 2.x.x deprecated)
+### Events (:warning: Since version 2.0.0 deprecated)
 
 * In `path/to/root/events/events.yml`, must add [this](docs/events/events.yml)
 
