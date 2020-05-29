@@ -219,7 +219,8 @@ Export Document have the options which will be used to get the data:
 * `userEmail` User Email which will be used to send the data
 * `dateCreated`
 
-In `path/to/root/[MS_PATH]/lambda/ExportProcess.js`.
+In `path/to/root/[MS_PATH]/lambda/ExportProcess/index.js`.
+
 
 #### Example
 
@@ -230,7 +231,7 @@ const { Handler } = require('@janiscommerce/lambda');
 const { ExportProcess } = require('@janiscommerce/export');
 const EventEmitter = require('@janiscommerce/event-emitter');
 
-class ExportProcess extends CreatedListener {
+class MyExportProcess extends ExportProcess {
 
   async preProcess({id, entity}) {
 		return EventEmitter.emit({
@@ -249,12 +250,14 @@ class ExportProcess extends CreatedListener {
 	}
 }
 
-module.exports.handler = (...args) => Handler.handle(ExportProcess, ...args);
+module.exports.handler = (...args) => Handler.handle(MyExportProcess, ...args);
 ```
 
 ### Export serverless
 
 In `path/to/root/serverless.js` add:
+
+:bulb: It is important to send as a parameter the service name. For example: 'wms'
 
 ```js
 'use strict';
@@ -267,10 +270,12 @@ module.exports = helper({
 	hooks: [
 		// other hooks
         ...functions,
-        ...exportServerless
+        ...exportServerless('wms')
 	]
 });
 ```
+
+:bulb: Do not forget to add the [IAM Statement Permissions](https://www.npmjs.com/package/@janiscommerce/lambda).
 
 ### Schemas
 

@@ -5,18 +5,16 @@ const path = require('path');
 const { exportServerless } = require('../lib/index');
 
 const handlerPathWithSrc = path.join('src', 'lambda', 'ExportProcess', 'index.handler');
-const clientModelPathWithSrc = path.join('src', 'models', 'client.js');
 const controllersPathWithSrc = path.join('src', 'controllers', 'export', '**');
 const modelsPathWithSrc = path.join('src', 'models', '**');
 
 const handlerPathWithoutSrc = path.join('lambda', 'ExportProcess', 'index.handler');
-const clientModelPathWithoutSrc = path.join('models', 'client.js');
 const controllersPathWithoutSrc = path.join('controllers', 'export', '**');
 const modelsPathWithoutSrc = path.join('models', '**');
 
 const resourceAux = '${self:custom.stage}';// eslint-disable-line
 
-const getHooks = (handlerPath, modelsPath, controllersPath, clientModelPath) => [
+const getHooks = (handlerPath, modelsPath, controllersPath) => [
 	[
 		'janis.apiPost', {
 			entityName: 'export',
@@ -33,7 +31,7 @@ const getHooks = (handlerPath, modelsPath, controllersPath, clientModelPath) => 
 			handler: handlerPath,
 			description: 'Export Process Lambda',
 			timeout: 60,
-			package: { include: ['schemas/mongo/**', clientModelPath] }
+			package: { include: [modelsPath, controllersPath] }
 		}
 	],
 
@@ -56,13 +54,13 @@ describe('export-serveless', () => {
 		it('Should return the correct hooks with MS_PATH ', () => {
 			process.env.MS_PATH = 'src';
 			assert.deepStrictEqual(exportServerless('wms'),
-				getHooks(handlerPathWithSrc, modelsPathWithSrc, controllersPathWithSrc, clientModelPathWithSrc));
+				getHooks(handlerPathWithSrc, modelsPathWithSrc, controllersPathWithSrc));
 		});
 
 		it('Should return the correct hooks without MS_PATH', () => {
 			delete (process.env.MS_PATH);
 			assert.deepStrictEqual(exportServerless('wms'),
-				getHooks(handlerPathWithoutSrc, modelsPathWithoutSrc, controllersPathWithoutSrc, clientModelPathWithoutSrc));
+				getHooks(handlerPathWithoutSrc, modelsPathWithoutSrc, controllersPathWithoutSrc));
 		});
 	});
 });
