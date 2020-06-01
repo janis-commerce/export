@@ -19,7 +19,7 @@ describe('API Export', () => {
 
 	const exportData = {
 		userEmail: 'user@email.com',
-		status: ModelExport.statuses.created
+		status: ModelExport.statuses.pending
 	};
 
 	const exportId = '5e0a0619bcc3ce0007a18011';
@@ -220,7 +220,7 @@ describe('API Export', () => {
 					sandbox.assert.calledOnce(MsCall.prototype.call);
 					sandbox.assert.calledOnceWithExactly(ModelExport.prototype.insert, { ...exportDocument, ...exportData, userCreated: 2 });
 					sandbox.assert.calledOnceWithExactly(Invoker.clientCall, 'ExportProcess', 'defaultClient',
-						{ id: exportId, ...exportDocument, ...exportData, userCreated: 2 });
+						{ exportDocument: { id: exportId, ...exportDocument, ...exportData, userCreated: 2 } });
 				}
 			},
 			{
@@ -269,7 +269,7 @@ describe('API Export', () => {
 					const exportDocumentFormatted = { ...exportDocument, sortDirection: 'asc' };
 					sandbox.assert.calledOnce(MsCall.prototype.call);
 					sandbox.assert.calledOnceWithExactly(Invoker.clientCall, 'ExportProcess', 'defaultClient',
-						{ id: exportId, ...exportData, ...exportDocumentFormatted, userCreated: 2 });
+						{ exportDocument: { id: exportId, ...exportData, ...exportDocumentFormatted, userCreated: 2 } });
 					sandbox.assert.calledOnceWithExactly(ModelExport.prototype.insert, { ...exportDocumentFormatted, ...exportData, userCreated: 2 });
 				}
 			}

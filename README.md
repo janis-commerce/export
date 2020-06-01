@@ -24,10 +24,7 @@ In orden to be functional the Export API needs:
 * Create Controllers for those entities
 * Create a generic API Export (:warning: since version 2.0.0 major changes - now it uses lambda functions)
 * Export process lambda function.
-* Create a generic Created Export Listener (:warning: deprecated since version 2.0.0)
-* Create a generic Processed Export Listener (:warning: deprecated since version 2.0.0)
 * Configure Schemas, and Serverless functions
-* Configure Events (:warning: deprecated since version 2.0.0)
 * Configure `.nycrc` to avoid coverage leaks
 
 ### ENV vars
@@ -37,7 +34,11 @@ Needs to be setup
 * `JANIS_SERVICE_NAME`, Service Name
 * `JANIS_ENV`, Environment
 
-In order to use S3 Bucket
+In order to use S3 Bucket. 
+
+:bulb: Do not forget to add the [Enviroment Variables from lambda package](https://www.npmjs.com/package/@janiscommerce/lambda).
+
+
 
 ### Models
 
@@ -194,9 +195,12 @@ module.exports = ApiExport;
 
 ### Export process
 
+In `path/to/root/[MS_PATH]/lambda/ExportProcess/index.js`.
+
 Only need to require `ExportProcess` and extend your class, for basic use.
 
 #### Customize
+
 
 There are a few options to customize the exports.
 
@@ -219,9 +223,6 @@ Export Document have the options which will be used to get the data:
 * `userEmail` User Email which will be used to send the data
 * `dateCreated`
 
-In `path/to/root/[MS_PATH]/lambda/ExportProcess/index.js`.
-
-
 #### Example
 
 ```js
@@ -234,20 +235,24 @@ const EventEmitter = require('@janiscommerce/event-emitter');
 class MyExportProcess extends ExportProcess {
 
   async preProcess({id, entity}) {
-		return EventEmitter.emit({
-      entity,
-      event: 'export-started'.
-      id
-    });
+    return EventEmitter.emit(
+      {
+        entity,
+        event: 'export-started'.
+        id
+      }
+    );
   }
 
   async postProcess({id, entity}) {
-		return EventEmitter.emit({
-      entity,
-      event: 'export-finished'.
-      id
-    });
-	}
+    return EventEmitter.emit(
+      {
+        entity,
+        event: 'export-finished'.
+        id
+      }
+    );
+  }
 }
 
 module.exports.handler = (...args) => Handler.handle(MyExportProcess, ...args);
@@ -430,85 +435,16 @@ module.exports = FlightController;
 
 
 
-## :warning: :skull: Deprecated
+## :warning: :skull:  Removed
 
 Since version 2.0.0 the package does not use events. Instead uses the[@janiscommerce/lambda](https://www.npmjs.com/package/@janiscommerce/lambda) package.
 
-### Created Listener (:warning: Since version 2.0.0 deprecated)
+The following listeners were removed:
 
-Only need to require `CreatedListener` and extend your class, for basic use.
+- Created Listener (Since version 2.0.0 )
 
-#### Customize
+- Processed Listener (Since version 2.0.0)
 
-There are a few options to customize the exports.
 
-* *async* `preProcess(exportDocument)`.
-
-  Params: `exportDocument`, the export options.
-  Method to do something before the export process starts, like Emit an event or saved in Database or Cache, some other validation.
-
-* *async* `postProcess(exportDocumentSaved)`.
-
-  Params: `exportDocumentSaved`, the export options.
-  Method to do something after the export process was created and files are uploaded, like Emit an event or saved in Database or Cache, some other validation.
-
-Export Document have the options which will be used to get the data:
-* `entity`, Entity name
-* `filters`, filters to be used
-* `sortBy`, fields to be sorted by
-* `sortDirection`, sort direction (`asc` or `desc`)
-* `userCreated` ID of User who request the export
-* `userEmail` User Email which will be used to send the data
-* `dateCreated`
-* `dateModified`
-
-#### Example
-
-```js
-'use strict';
-
-const { ServerlessHandler } = require('@janiscommerce/event-listener');
-const { CreatedListener } = require('@janiscommerce/export');
-const EventEmitter = require('@janiscommerce/event-emitter');
-
-class ExportCreatedListener extends CreatedListener {
-
-  async preProcess({id, entity}) {
-		return EventEmitter.emit({
-      entity,
-      event: 'export-started'.
-      id
-    });
-  }
-
-  async postSaveHook({id, entity}) {
-		return EventEmitter.emit({
-      entity,
-      event: 'export-finished'.
-      id
-    });
-	}
-}
-
-module.exports.handler = (...args) => ServerlessHandler.handle(ExportCreatedListener, ...args);
-```
-
-### Processed Listener (:warning: Since version 2.0.0 deprecated)
-
-Only need to require `ProcessedListener` and export it.
-
-```js
-'use strict';
-
-const { ServerlessHandler } = require('@janiscommerce/event-listener');
-const { ProcessedListener } = require('@janiscommerce/export');
-
-module.exports.handler = (...args) => ServerlessHandler.handle(ProcsesedListener, ...args);
-```
-
-### Events (:warning: Since version 2.0.0 deprecated)
-
-* In `path/to/root/events/events.yml`, must add [this](docs/events/events.yml)
-
-* In `path/to/root/events/src/{your-service}/export/created.yml`, must add [this file](docs/events/src/export/created.yml)
-* In `path/to/root/events/src/{your-service}/export/processed.yml`, must add [this file](docs/events/src/export/processed.yml)
+Also, the files: 
+- Events (Since version 2.0.0)
