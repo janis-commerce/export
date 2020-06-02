@@ -560,9 +560,13 @@ describe('Export Process Test', async () => {
 			sandbox.assert.calledOnce(Mail.prototype.setData);
 			sandbox.assert.calledOnce(Mail.prototype.setTemplateCode);
 
-			// sandbox.assert.calledWithExactly.getCall(1)(ModelExport.prototype.save,
-			// 	{ ...exportDocument,
-			// 		files, status: ModelExport.statuses.sendingError , error: 'Mails Failed'});
+			sandbox.assert.calledWithExactly(ModelExport.prototype.save.getCall(1),
+				{
+					...exportDocument,
+					files,
+					status: ModelExport.statuses.sendingError,
+					error: 'Mails Failed'
+				});
 		});
 	});
 });
