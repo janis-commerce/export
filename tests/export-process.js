@@ -29,7 +29,8 @@ describe('Export Process Test', async () => {
 		sortBy: 'bornYear',
 		sortDirection: 'desc',
 		userCreated: '5e0a0619bcc3ce0007a18123',
-		userEmail: 'dogs@revenge.com'
+		userEmail: 'dogs@revenge.com',
+		status: ModelExport.statuses.pending
 	};
 
 	const event = {
