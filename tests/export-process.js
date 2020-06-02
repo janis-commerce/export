@@ -191,13 +191,38 @@ describe('Export Process Test', async () => {
 		});
 
 
+		it('Should throw an error if it can update the pending status to processing', async () => {
+
+			sandbox.stub(ModelExport.prototype, 'update').rejects(new Error('Some Error'));
+
+			await assert.rejects(exportProcessHandler(event), { message: 'Some Error' });
+
+			sandbox.assert.calledOnceWithExactly(ModelExport.prototype.update,
+				{
+					status: ModelExport.statuses.processing
+				},
+				{
+					id: exportDocument.id,
+					status: ModelExport.statuses.pending
+				});
+		});
+
 		it('Should\'t generateAndUploadFiles if pre process throws an error', async () => {
 
+			sandbox.stub(ModelExport.prototype, 'update').returns(true);
 			sandbox.stub(ExportProcess.prototype, 'preProcess').rejects(new Error('Some Error'));
 			sandbox.stub(ControllerExport.prototype, 'generateAndUploadFiles').returns(true);
 
 			await assert.rejects(exportProcessHandler(event), { message: 'Some Error' });
 
+			sandbox.assert.calledOnceWithExactly(ModelExport.prototype.update,
+				{
+					status: ModelExport.statuses.processing
+				},
+				{
+					id: exportDocument.id,
+					status: ModelExport.statuses.pending
+				});
 			sandbox.assert.calledOnceWithExactly(ExportProcess.prototype.preProcess, exportDocument);
 			sandbox.assert.notCalled(ControllerExport.prototype.generateAndUploadFiles);
 		});
@@ -205,6 +230,7 @@ describe('Export Process Test', async () => {
 
 		it('Should throw if it can\'t save the new export document\'s status with the files', async () => {
 
+			sandbox.stub(ModelExport.prototype, 'update').returns(true);
 			sandbox.spy(ExportProcess.prototype, 'preProcess');
 			sandbox.spy(ExportProcess.prototype, 'postProcess');
 			sandbox.stub(FakeModel.prototype, 'get').returns([]);
@@ -212,6 +238,7 @@ describe('Export Process Test', async () => {
 
 			await assert.rejects(exportProcessHandler(event), { message: 'Some DB error' });
 
+			sandbox.assert.calledOnce(ModelExport.prototype.update);
 			sandbox.assert.calledOnce(ExportProcess.prototype.preProcess);
 			sandbox.assert.calledOnce(ExportProcess.prototype.postProcess);
 			sandbox.assert.calledOnceWithExactly(ModelExport.prototype.save,
@@ -241,6 +268,7 @@ describe('Export Process Test', async () => {
 
 			sandbox.assert.calledOnce(ExportProcess.prototype.preProcess);
 			sandbox.assert.calledOnce(ExportProcess.prototype.postProcess);
+			sandbox.assert.calledTwice(ModelExport.prototype.update);
 			sandbox.assert.calledOnce(FakeControllerFormatFilters.prototype.formatByPage);
 			sandbox.assert.notCalled(FakeControllerFormatFilters.prototype.formatByFile);
 
@@ -262,7 +290,7 @@ describe('Export Process Test', async () => {
 
 			sandbox.assert.calledOnceWithExactly(ExportProcess.prototype.sendEmail, { ...exportDocument, files: [] });
 
-			sandbox.assert.calledOnceWithExactly(ModelExport.prototype.update, {
+			sandbox.assert.calledWithExactly(ModelExport.prototype.update.getCall(1), {
 				status: ModelExport.statuses.sent
 			}, {
 				id: exportDocument.id,
@@ -288,7 +316,7 @@ describe('Export Process Test', async () => {
 			sandbox.assert.calledThrice(S3.putObject);
 			sandbox.assert.calledOnce(ExportProcess.prototype.postProcess);
 			sandbox.assert.calledOnceWithExactly(ExportProcess.prototype.sendEmail, { ...exportDocument, files });
-			sandbox.assert.calledOnce(ModelExport.prototype.update);
+			sandbox.assert.calledTwice(ModelExport.prototype.update);
 		});
 
 		it('Should thrown an error when it fails generating the files', async () => {
@@ -309,7 +337,7 @@ describe('Export Process Test', async () => {
 			sandbox.assert.notCalled(S3.putObject);
 			sandbox.assert.notCalled(ExportProcess.prototype.postProcess);
 			sandbox.assert.notCalled(ExportProcess.prototype.sendEmail);
-			sandbox.assert.notCalled(ModelExport.prototype.update);
+			sandbox.assert.calledOnce(ModelExport.prototype.update);
 		});
 
 		it('Should throw an error when it fails uploading the files', async () => {
@@ -330,7 +358,7 @@ describe('Export Process Test', async () => {
 			sandbox.assert.calledThrice(S3.putObject);
 			sandbox.assert.notCalled(ExportProcess.prototype.postProcess);
 			sandbox.assert.notCalled(ExportProcess.prototype.sendEmail);
-			sandbox.assert.notCalled(ModelExport.prototype.update);
+			sandbox.assert.calledOnce(ModelExport.prototype.update);
 		});
 	});
 
@@ -380,7 +408,7 @@ describe('Export Process Test', async () => {
 			sandbox.assert.calledOnce(ExportProcess.prototype.postProcess);
 			assert(excludeFieldsSpy.get.called);
 			assert(getExcelHeadersSpy.returned(['legs', 'bornYear', 'eyes', 'isOld']));
-			sandbox.assert.calledOnce(ModelExport.prototype.update);
+			sandbox.assert.calledTwice(ModelExport.prototype.update);
 		});
 
 	});
@@ -434,7 +462,7 @@ describe('Export Process Test', async () => {
 
 			commonAsserts(FakeControllerIncludesFields);
 
-			sandbox.assert.calledOnce(ModelExport.prototype.update);
+			sandbox.assert.calledTwice(ModelExport.prototype.update);
 			sandbox.assert.calledThrice(ExcelJS.Workbook.prototype.xlsx.writeBuffer);
 			sandbox.assert.calledThrice(S3.putObject);
 			sandbox.assert.calledOnceWithExactly(ExportProcess.prototype.sendEmail, { ...exportDocument, files });
@@ -503,8 +531,9 @@ describe('Export Process Test', async () => {
 			sandbox.assert.calledThrice(ExcelJS.Workbook.prototype.xlsx.writeBuffer);
 			sandbox.assert.calledThrice(S3.putObject);
 			sandbox.assert.calledOnce(ExportProcess.prototype.postProcess);
+			sandbox.assert.calledTwice(ModelExport.prototype.update);
 
-			sandbox.assert.calledOnceWithExactly(ModelExport.prototype.update,
+			sandbox.assert.calledWithExactly(ModelExport.prototype.update.getCall(1),
 				{ status: ModelExport.statuses.sent },
 				{ id: exportDocument.id, status: ModelExport.statuses.processed });
 			sandbox.assert.calledOnceWithExactly(Mail.prototype.setEntity, 'export');
@@ -531,7 +560,7 @@ describe('Export Process Test', async () => {
 			sandbox.assert.notCalled(FakeControllerFormatFilters.prototype.formatByFile);
 			sandbox.assert.calledOnce(ModelExport.prototype.save);
 			sandbox.assert.calledOnce(FakeModel.prototype.get);
-			sandbox.assert.calledOnce(ModelExport.prototype.update);
+			sandbox.assert.calledTwice(ModelExport.prototype.update);
 		});
 
 		it('Should not throw an error if Mail fails', async () => {
@@ -550,6 +579,7 @@ describe('Export Process Test', async () => {
 
 			await exportProcessHandler(event);
 
+			sandbox.assert.calledOnce(ModelExport.prototype.update);
 			sandbox.assert.calledTwice(ModelExport.prototype.save);
 			commonAsserts(FakeControllerFormatFilters);
 			sandbox.assert.calledThrice(ExcelJS.Workbook.prototype.xlsx.writeBuffer);
