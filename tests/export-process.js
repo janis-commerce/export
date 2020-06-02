@@ -154,7 +154,7 @@ describe('Export Process Test', async () => {
 			sandbox.assert.notCalled(ExportProcess.prototype.process);
 		});
 
-		it('Should call process when payload is not passed', async () => {
+		it('Should not call process when payload is not passed', async () => {
 
 			sandbox.stub(ExportProcess.prototype, 'process').returns(true);
 
@@ -164,6 +164,30 @@ describe('Export Process Test', async () => {
 			});
 
 			sandbox.assert.notCalled(ExportProcess.prototype.process);
+		});
+
+		context('When fields are wrong', async () => {
+
+			const makeWrongInput = field => {
+
+				const data = { ...exportDocument };
+				data[field] = [123];
+				return data;
+			};
+
+			const samples = Object.keys(exportDocument);
+
+			samples.forEach(async field => {
+
+				it(`Should not call process when ${field} is wrong`, async () => {
+
+					sandbox.stub(ExportProcess.prototype, 'process').returns(true);
+
+					await exportProcessHandler(makeWrongInput(field));
+
+					sandbox.assert.notCalled(ExportProcess.prototype.process);
+				});
+			});
 		});
 
 
