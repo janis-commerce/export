@@ -208,6 +208,23 @@ describe('Export Process Test', async () => {
 				});
 		});
 
+		it('Should throw an error if it can not update the exportDocument', async () => {
+
+			sandbox.stub(ModelExport.prototype, 'update').returns(0);
+
+			await assert.rejects(exportProcessHandler(event));
+
+			sandbox.assert.calledOnceWithExactly(ModelExport.prototype.update,
+				{
+					status: ModelExport.statuses.processing
+				},
+				{
+					id: exportDocument.id,
+					status: ModelExport.statuses.pending
+				});
+		});
+
+
 		it('Should\'t generateAndUploadFiles if pre process throws an error', async () => {
 
 			sandbox.stub(ModelExport.prototype, 'update').returns(true);
