@@ -208,11 +208,12 @@ describe('Export Process Test', async () => {
 				});
 		});
 
-		it('Should throw an error if it can not update the exportDocument', async () => {
+		it('Should end lambda execution if there are no export document updated', async () => {
 
 			sandbox.stub(ModelExport.prototype, 'update').returns(0);
+			sandbox.stub(ExportProcess.prototype, 'preProcess').returns(true);
 
-			await assert.rejects(exportProcessHandler(event));
+			await exportProcessHandler(event);
 
 			sandbox.assert.calledOnceWithExactly(ModelExport.prototype.update,
 				{
@@ -222,6 +223,7 @@ describe('Export Process Test', async () => {
 					id: exportDocument.id,
 					status: ModelExport.statuses.pending
 				});
+			sandbox.assert.notCalled(ExportProcess.prototype.preProcess);
 		});
 
 
