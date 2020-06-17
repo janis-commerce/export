@@ -1,6 +1,6 @@
 {
   "name": "@janiscommerce/export",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A package to handle Janis Exports",
   "main": "lib/index.js",
   "scripts": {
@@ -18,16 +18,16 @@
   "license": "ISC",
   "homepage": "https://github.com/janis-commerce/export.git#readme",
   "devDependencies": {
-    "@janiscommerce/api-test": "^2.1.2",
-    "@janiscommerce/event-listener-test": "^1.0.0",
-    "eslint": "^5.16.0",
+    "@janiscommerce/api-test": "^3.0.1",
+    "@janiscommerce/event-listener-test": "^2.0.0",
+    "eslint": "^7.2.0",
     "eslint-config-airbnb-base": "^13.2.0",
     "eslint-plugin-import": "^2.18.2",
     "husky": "^2.4.1",
-    "mocha": "^5.2.0",
+    "mocha": "^8.0.1",
     "mock-require": "^3.0.3",
-    "nyc": "^13.1.0",
-    "sinon": "^7.5.0"
+    "nyc": "^15.1.0",
+    "sinon": "^9.0.2"
   },
   "files": [
     "lib/"
@@ -36,7 +36,7 @@
     "test": "tests"
   },
   "dependencies": {
-    "@janiscommerce/api-save": "^4.5.0",
+    "@janiscommerce/api-save": "^5.0.0",
     "@janiscommerce/lambda": "^1.0.0",
     "@janiscommerce/mail": "^2.0.0",
     "@janiscommerce/microservice-call": "^4.0.0",

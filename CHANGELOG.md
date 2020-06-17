@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [2.0.1] - 2020-06-17
+### Changed
+- API Save dependency upgraded to v5 (`api-session` validates locations)
+
 ## [2.0.0] - 2020-06-04
 ### Added
 - Export-Serverless getter - add serverless hooks and  iamStatements.

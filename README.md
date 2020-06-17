@@ -14,7 +14,28 @@ When It's funcional the API will get documents from Entities in your Microservic
 npm install @janiscommerce/export
 ```
 
+## ⚠️ **Breaking changes from version *2*** ⚠️
 
+### Lambda functions
+*Since 2.0.0*
+
+- The package does not use events. Instead uses the[@janiscommerce/lambda](https://www.npmjs.com/package/@janiscommerce/lambda) package.
+
+The following listeners were removed:
+
+- Created Listener
+- Processed Listener
+
+
+Also, the files: 
+- Events
+
+### API Session
+*Since 2.0.1*
+
+API Save upgraded to v5. API Session store validations replaced with loactions
+
+For more information see [API Save](https://www.npmjs.com/package/@janiscommerce/api-save), [API](https://www.npmjs.com/package/@janiscommerce/api) and [API Session](https://www.npmjs.com/package/@janiscommerce/api-session)
 
 ## Configuration
 
@@ -37,7 +58,6 @@ Needs to be setup
 In order to use S3 Bucket. 
 
 :bulb: Do not forget to add the [Enviroment Variables from lambda package](https://www.npmjs.com/package/@janiscommerce/lambda).
-
 
 
 ### Models
@@ -432,19 +452,3 @@ class FligthController extends ControllerExport {
 
 module.exports = FlightController;
 ```
-
-
-
-## :warning: :skull:  Removed
-
-Since version 2.0.0 the package does not use events. Instead uses the[@janiscommerce/lambda](https://www.npmjs.com/package/@janiscommerce/lambda) package.
-
-The following listeners were removed:
-
-- Created Listener (Since version 2.0.0 )
-
-- Processed Listener (Since version 2.0.0)
-
-
-Also, the files: 
-- Events (Since version 2.0.0)
