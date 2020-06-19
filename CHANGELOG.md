@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [2.0.2] - 2020-06-19
+### Changed
+- Updated `@janiscommerce/lambda` version
+
+### Fixed
+- `README.md` fixes
+
 ## [2.0.1] - 2020-06-17
 ### Changed
 - API Save dependency upgraded to v5 (`api-session` validates locations)

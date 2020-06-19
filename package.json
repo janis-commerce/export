@@ -1,6 +1,6 @@
 {
   "name": "@janiscommerce/export",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "A package to handle Janis Exports",
   "main": "lib/index.js",
   "scripts": {
@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@janiscommerce/api-save": "^5.0.0",
-    "@janiscommerce/lambda": "^1.0.0",
+    "@janiscommerce/lambda": "^1.0.1",
     "@janiscommerce/mail": "^2.0.0",
     "@janiscommerce/microservice-call": "^4.0.0",
     "@janiscommerce/model": "^4.1.0",

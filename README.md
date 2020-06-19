@@ -14,7 +14,7 @@ When It's funcional the API will get documents from Entities in your Microservic
 npm install @janiscommerce/export
 ```
 
-## ⚠️ **Breaking changes from version *2*** ⚠️
+## Breaking changes from version *2* ⚠️
 
 ### Lambda functions
 *Since 2.0.0*
@@ -74,9 +74,9 @@ const { ModelExport } = require('@janiscommerce/export');
 module.exports = ModelExport;
 ```
 
-* The Entities models must be in `path/to/root/[MS_PATH]/models/[ENTITY].js`. It are the same for list, get or save in your microservice.
-  * `MS_PATH` : environment variable. Usually `src`.
-  * `ENTITY` : entity name
+The Entities models must be in `path/to/root/[MS_PATH]/models/[ENTITY].js`. It are the same for list, get or save in your microservice.
+* `MS_PATH` : environment variable. Usually `src`.
+* `ENTITY` : entity name
 
 #### Example
 
@@ -86,7 +86,7 @@ module.exports = ModelExport;
 const Model = require('@janiscommerce/model');
 
 class CatModel extends Model {
-    static get table() {
+	static get table() {
 		return 'cats';
 	}
 }
@@ -108,38 +108,38 @@ There are a few options to customize the exports.
 
 * *getter* `pageLimit`
 
-  Returns `{ number }`. Default `5000`.
-  It is the Pagination Limit to obtain documents from Database
+	Returns `{ number }`. Default `5000`.
+	It is the Pagination Limit to obtain documents from Database
 
 * *getter* `fileLimit`
 
-  Returns `{ number} `. Default `25000`.
-  It is the Document Limit to make the files.
+	Returns `{ number} `. Default `25000`.
+	It is the Document Limit to make the files.
 
 * *getter* `fileUrlExpirationTime`
 
-  Returns `{ number} `. Default `86400`.
-  It is the Expiration Time to be available to download. In Seconds, one day be default.
+	Returns `{ number} `. Default `86400`.
+	It is the Expiration Time to be available to download. In Seconds, one day be default.
 
 * *async* `format(item)`.
 
-  Returns `{ Object }`. Default `item`.
-  Format Item Individually after getting from Database.
+	Returns `{ Object }`. Default `item`.
+	Format Item Individually after getting from Database.
 
 * *async* `formatByPage(items)`.
 
-  Returns `{ [Object] }`. Default `items`.
-  Format Items by Page after getting from Database.
+	Returns `{ [Object] }`. Default `items`.
+	Format Items by Page after getting from Database.
 
 * *async* `formatByFile(items)`.
 
-  Returns `{ [Object] }`. Default `items`.
-  Format Items before making the file.
+	Returns `{ [Object] }`. Default `items`.
+	Format Items before making the file.
 
 * `formatFilters(filters)`.
 
-  Returns `{ Object }`. Default `filters`.
-  Customize filters to get records from database
+	Returns `{ Object }`. Default `filters`.
+	Customize filters to get records from database
 
 #### File Fields / Headers
 By Default, Every field in the items getted will be include in the files as headers of each column.
@@ -148,13 +148,13 @@ But it can be changed by only one of these getters at a time:
 
 * *getter* `fields`
 
-  Returns `{ [String] } `. Default `[]`.
-  A List of fields to include in the File. It has high priority
+	Returns `{ [String] } `. Default `[]`.
+	A List of fields to include in the File. It has high priority
 
 * *getter* `excludeFields`
 
-  Returns `{ [String] } `. Default `[]`.
-  A List of fields to exclude in the File. If `fields` has elements Its will be ignored
+	Returns `{ [String] } `. Default `[]`.
+	A List of fields to exclude in the File. If `fields` has elements Its will be ignored
 
 #### Example
 
@@ -165,36 +165,36 @@ const { ControllerExport } = require('@janiscommerce/export');
 
 class CatController extends ControllerExport {
 
-  get pageLimit() {
-    return 100; // Will get pages with 100 documents max
-  }
+	get pageLimit() {
+		return 100; // Will get pages with 100 documents max
+	}
 
 	get fileLimit() {
 		return 1000000; // Will create files with 1 millon documents max
-  }
+	}
 
-  get fileLimit() {
+	get fileLimit() {
 		return 1000000; // Will create files with 1 millon documents max
-  }
+	}
 
-  get fileUrlExpirationTime() {
-    return 3600; // Download will be available for 1 hour
-  }
+	get fileUrlExpirationTime() {
+		return 3600; // Download will be available for 1 hour
+	}
 
 	get excludeFields() {
 		return ['name']; // Will try to exclude 'name' field, but because 'fields' method has elements it will be ignored
-  }
+	}
 
-  async format(item) {
-    return {...item, userProfile: this.session.profileId };
-  }
+	async format(item) {
+		return {...item, userProfile: this.session.profileId };
+	}
 
-  async formatByPage(items) {
+	async formatByPage(items) {
 		return items.map(({ keywords, ...item}) => ({ ... item, keywords: keywords.toLowerCase() }));
-  }
+	}
 
-  async formatByFile(items) {
-		return items.map(item) => ({ ... item, status: 'alive' }));
+	async formatByFile(items) {
+		return items.map(item) => ({ ... item, status: 'alive' });
 	}
 }
 
@@ -226,13 +226,13 @@ There are a few options to customize the exports.
 
 * *async* `preProcess(exportDocument)`.
 
-  Params: `exportDocument`, the export options.
-  Method to do something before the export process starts, like Emit an event or saved in Database or Cache, some other validation.
+	Params: `exportDocument`, the export options.
+	Method to do something before the export process starts, like Emit an event or saved in Database or Cache, some other validation.
 
 * *async* `postProcess(exportDocumentSaved)`.
 
-  Params: `exportDocumentSaved`, the export options.
-  Method to do something after the export process was created and files are uploaded, like Emit an event or saved in Database or Cache, some other validation.
+	Params: `exportDocumentSaved`, the export options.
+	Method to do something after the export process was created and files are uploaded, like Emit an event or saved in Database or Cache, some other validation.
 
 Export Document have the options which will be used to get the data:
 * `entity`, Entity name
@@ -254,25 +254,21 @@ const EventEmitter = require('@janiscommerce/event-emitter');
 
 class MyExportProcess extends ExportProcess {
 
-  async preProcess({id, entity}) {
-    return EventEmitter.emit(
-      {
-        entity,
-        event: 'export-started'.
-        id
-      }
-    );
-  }
+	async preProcess({id, entity}) {
+		return EventEmitter.emit({
+			entity,
+			event: 'export-started'.
+			id
+		});
+	}
 
-  async postProcess({id, entity}) {
-    return EventEmitter.emit(
-      {
-        entity,
-        event: 'export-finished'.
-        id
-      }
-    );
-  }
+	async postProcess({id, entity}) {
+		return EventEmitter.emit({
+			entity,
+			event: 'export-finished'.
+			id
+		});
+	}
 }
 
 module.exports.handler = (...args) => Handler.handle(MyExportProcess, ...args);
@@ -294,8 +290,8 @@ const { exportServerless } =  require('@janiscommerce/export');
 module.exports = helper({
 	hooks: [
 		// other hooks
-        ...functions,
-        ...exportServerless('wms')
+		...functions,
+		...exportServerless('wms')
 	]
 });
 ```
@@ -309,24 +305,22 @@ In `path/to/root/schemas/src/public/export` add:
 * [`base.yml` file](docs/schemas/export/base.yml)
 * [`post.yml` file](docs/schemas/export/post.yml)
 
-
 ### `.nycrc`
 
 Create or update `./.nycrc` to avoid coverage leaks:
 
 ```
 {
-  "exclude": [
-    //... your files
-    "src/models/export.js",
-    "src/api/export/post.js",
-    "src/lambda/ExportProcess.js"
-  ]
+	"exclude": [
+		//... your files
+		"src/models/export.js",
+		"src/api/export/post.js",
+		"src/lambda/ExportProcess.js"
+	]
 }
 ```
 
 :warning: If exists any customization of the files, do not add the file to the .nyrcr and add the corresponding tests.
-
 
 
 ## Usage
@@ -342,13 +336,13 @@ For Start Exporting data `ApiExport` received in the body:
 
 ```js
 {
-  entity: 'cats'
-  filters: {
-    region: 'europe'
-    gender: 'female'
-  },
-  sortBy: 'color',
-  sortDirection: 'desc'
+	entity: 'cats'
+	filters: {
+		region: 'europe'
+		gender: 'female'
+	},
+	sortBy: 'color',
+	sortDirection: 'desc'
 }
 ```
 
@@ -374,30 +368,32 @@ Usage
 
 ```js
 const { ExportHelper } = require('@janiscommerce/export');
-const { MsCall } = require('@janiscommerce/microservice-call);
+const { MsCall } = require('@janiscommerce/microservice-call');
 
 class AirlineHelper extends ExportHelper {
 
-  get(items, session) {
+	get(items, session) {
 
-    // important!! define this.items
-    this.items = items;
+		// important!! define this.items
+		this.items = items;
 
-    const airlinesIds = this.getIds('airlineId');
+		const airlinesIds = this.getIds('airlineId');
 
-    if(! airlinesIds.length)// to avoid unneed requests
-      return {};
+		if(!airlinesIds.length)// to avoid unneed requests
+			return {};
 
-    const msCall = session.getSessionInstance(MsCall);
+		const msCall = session.getSessionInstance(MsCall);
 
-    const { body, statusCode } = await microServiceCall.safeList('InternationalAirlines', 'airline', { filters: { id: airlinesIds } );
+		const { body, statusCode } = await microServiceCall.safeList('InternationalAirlines', 'airline', { filters: { id: airlinesIds } } );
 
-    if(statusCode >= 400)
-     return {};
+		if(statusCode >= 400)
+			return {};
 
-    return this.mapIdToEntity(body)
-  }
+		return this.mapIdToEntity(body)
+	}
 }
+
+module.exports = AirlineHelper;
 ```
 
 #### UserHelper
@@ -428,26 +424,26 @@ const { AirlineHelper } = require('../helpers/airline-helper');
 
 class FligthController extends ControllerExport {
 
-  async formatByPage(items){
+	async formatByPage(items) {
 
-      await setAirlines(items);
-      await setUsers(items);
+		await setAirlines(items);
+		await setUsers(items);
 
-      return items.map(flight => ({
-        airline: this.airlines[flight.airlineId].name,
-        aliance: this.airlines[flight.airlineId].aliance,
-        userCreated: ExportFormatters.formatUser(this.users[flight.userCreated]),
-        dateCreated: ExportFormatters.formatDate(flight.dateCreated)
-      }))
-  }
+		return items.map(flight => ({
+			airline: this.airlines[flight.airlineId].name,
+			aliance: this.airlines[flight.airlineId].aliance,
+			userCreated: ExportFormatters.formatUser(this.users[flight.userCreated]),
+			dateCreated: ExportFormatters.formatDate(flight.dateCreated)
+		}));
+	}
 
-  async setAirlines(items, session) {
-    this.airlines = await AirlineHelper.get(items, session);
-  }
+	async setAirlines(items, session) {
+		this.airlines = await AirlineHelper.get(items, session);
+	}
 
-  async setUsers(items, session){
-    this.users = await UserHelper.getUsers(items, session);
-  }
+	async setUsers(items, session){
+		this.users = await UserHelper.getUsers(items, session);
+	}
 }
 
 module.exports = FlightController;
