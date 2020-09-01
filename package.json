@@ -1,6 +1,6 @@
 {
   "name": "@janiscommerce/export",
-  "version": "2.0.2",
+  "version": "3.0.0",
   "description": "A package to handle Janis Exports",
   "main": "lib/index.js",
   "scripts": {
