@@ -1,7 +1,12 @@
 'use strict';
 
+const assert = require('assert');
+
 const ApiTest = require('@janiscommerce/api-test');
 const MsCall = require('@janiscommerce/microservice-call');
+
+const { ApiSession } = require('@janiscommerce/api-session');
+
 const { Invoker } = require('@janiscommerce/lambda');
 const mockRequire = require('mock-require');
 const path = require('path');
@@ -217,9 +222,14 @@ describe('API Export', () => {
 				},
 				after: (response, sandbox) => {
 
-					sandbox.assert.calledOnce(MsCall.prototype.call);
 					sandbox.assert.calledOnceWithExactly(ModelExport.prototype.insert, { ...exportDocument, ...exportData, userCreated: 2 });
-					sandbox.assert.calledOnceWithExactly(Invoker.clientCall, 'ExportProcess', 'defaultClient',
+
+					const session = Invoker.clientCall.args[0][1];
+
+					// valida que se pase la session a al Lambda
+					assert(session instanceof ApiSession);
+
+					sandbox.assert.calledOnceWithExactly(Invoker.clientCall, 'ExportProcess', session,
 						{ exportDocument: { id: exportId, ...exportDocument, ...exportData, userCreated: 2 } });
 				}
 			},
@@ -268,7 +278,13 @@ describe('API Export', () => {
 
 					const exportDocumentFormatted = { ...exportDocument, sortDirection: 'asc' };
 					sandbox.assert.calledOnce(MsCall.prototype.call);
-					sandbox.assert.calledOnceWithExactly(Invoker.clientCall, 'ExportProcess', 'defaultClient',
+
+					const session = Invoker.clientCall.args[0][1];
+
+					// valida que se pase la session a al Lambda
+					assert(session instanceof ApiSession);
+
+					sandbox.assert.calledOnceWithExactly(Invoker.clientCall, 'ExportProcess', session,
 						{ exportDocument: { id: exportId, ...exportData, ...exportDocumentFormatted, userCreated: 2 } });
 					sandbox.assert.calledOnceWithExactly(ModelExport.prototype.insert, { ...exportDocumentFormatted, ...exportData, userCreated: 2 });
 				}

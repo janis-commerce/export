@@ -1,7 +1,8 @@
 # Export
 
-[![Build Status](https://travis-ci.org/janis-commerce/export.svg?branch=master)](https://travis-ci.org/janis-commerce/export)
+![Build Status](https://github.com/janis-commerce/export/workflows/Build%20Status/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/janis-commerce/export/badge.svg?branch=master)](https://coveralls.io/github/janis-commerce/export?branch=master)
+[![npm version](https://badge.fury.io/js/%40janiscommerce%2Fexport.svg)](https://www.npmjs.com/package/@janiscommerce/export)
 
 A package to handle JANIS Export APIs.
 
@@ -14,6 +15,13 @@ When It's funcional the API will get documents from Entities in your Microservic
 npm install @janiscommerce/export
 ```
 
+## Breaking changes from version *3* ⚠️
+
+Updated dependencies 
+- [@janiscommerce/model](https://www.npmjs.com/package/@janiscommerce/model) version `^5.0.0`
+- [@janiscommerce/lambda](https://www.npmjs.com/package/@janiscommerce/lambda) version `^3.0.0`
+- [@janiscommerce/api-save](https://www.npmjs.com/package/@janiscommerce/api-save) version `^6.0.0`
+
 ## Breaking changes from version *2* ⚠️
 
 ### Lambda functions
@@ -25,7 +33,6 @@ The following listeners were removed:
 
 - Created Listener
 - Processed Listener
-
 
 Also, the files: 
 - Events
@@ -291,7 +298,7 @@ module.exports = helper({
 	hooks: [
 		// other hooks
 		...functions,
-		...exportServerless('wms')
+		...exportServerless('myService')
 	]
 });
 ```

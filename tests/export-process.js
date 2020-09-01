@@ -9,7 +9,6 @@ const path = require('path');
 const { Handler } = require('@janiscommerce/lambda');
 const Model = require('@janiscommerce/model');
 
-
 const S3 = require('@janiscommerce/s3');
 const ExcelJS = require('exceljs');
 const { Mail } = require('@janiscommerce/mail');
@@ -34,7 +33,7 @@ describe('Export Process Test', async () => {
 	};
 
 	const event = {
-		__clientCode: 'defaultClient',
+		session: { clientCode: 'defaultClient' },
 		body: { exportDocument }
 	};
 
@@ -143,13 +142,13 @@ describe('Export Process Test', async () => {
 			afterMockRequire();
 		});
 
-		it('Should not call process when client is not passed', async () => {
+		it('Should not call process when session is not passed', async () => {
 
 			sandbox.stub(ExportProcess.prototype, 'process').returns(true);
 
 			await exportProcessHandler({
 				...event,
-				__clientCode: undefined
+				session: undefined
 			});
 
 			sandbox.assert.notCalled(ExportProcess.prototype.process);
@@ -584,7 +583,6 @@ describe('Export Process Test', async () => {
 		});
 
 		it('Should not throw an error if Mail fails', async () => {
-
 
 			commonStubs(FakeControllerFormatFilters);
 			stubModelWith5Elelements();

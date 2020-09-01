@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [3.0.0] - 2020-09-01
+### Added
+- GitHub Actions for worflows build, coverage, publish
+
+### Changed
+- Upgraded `@janiscommerce/model` up to `^5.0.0`
+- Upgraded `@janiscommerce/lambda` up to `^3.0.0`
+- Upgraded `@janiscommerce/api-save` up to `^6.0.0`
+
 ## [2.0.2] - 2020-06-19
 ### Changed
 - Updated `@janiscommerce/lambda` version

@@ -4,6 +4,7 @@ paths:
     post:
       x-janis-namespace: export
       x-janis-method: create
+      x-janis-private: true
       operationId: createExport
       tags:
         - Export
