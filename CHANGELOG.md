@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [3.0.1] - 2020-09-17
+### Changed
+- Timeout for API Export function increased
+
 ## [3.0.0] - 2020-09-01
 ### Added
 - GitHub Actions for worflows build, coverage, publish

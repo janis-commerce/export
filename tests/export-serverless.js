@@ -20,7 +20,7 @@ const getHooks = (handlerPath, modelsPath, controllersPath) => [
 			entityName: 'export',
 			authorizer: 'ImportExportAuthorizer',
 			cors: true,
-			timeout: 10,
+			timeout: 30,
 			package: { include: [modelsPath, controllersPath] }
 		}
 	],
